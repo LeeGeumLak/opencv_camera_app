@@ -1,0 +1,2 @@
+rootProject.name='LGL Camera'
+include ':app', ':opencv'
