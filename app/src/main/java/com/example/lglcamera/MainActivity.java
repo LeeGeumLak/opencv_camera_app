@@ -36,7 +36,7 @@ import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
-    private static final String TAG = "opencv";
+    private static final String TAG = "MainActivity";
     private Button Button_RGB, Button_Gray, Button_HSV, Button_Text, Button_capture, Button_Sticker;
     private Mat matInput, matResult;
     private int GrayScale, RGBA, HSV;
@@ -53,6 +53,23 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         System.loadLibrary("opencv_java4");
         System.loadLibrary("native-lib");
     }
+
+
+    private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    openCvCameraView.enableView();
+                }
+                break;
+                default: {
+                    super.onManagerConnected(status);
+                }
+                break;
+            }
+        }
+    };
 
 
     @Override
@@ -160,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if (!mediaStorageDir.exists()){
             // 예외처리
             if (!mediaStorageDir.mkdirs()){ // 만약 mkdirs()가 제대로 동작하지 않을 경우, 오류 Log를 출력한 뒤, 해당 method 종료
-                Log.d("MainActivity", "폴더 생성 실패");
+                Log.d(TAG, "폴더 생성 실패");
                 return null;
             }
         }
@@ -184,6 +201,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         super.onPause();
         if (openCvCameraView != null)
             openCvCameraView.disableView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(TAG, "onResume : Internal OpenCV library not found.");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, loaderCallback);
+        } else {
+            Log.d(TAG, "onResume : OpenCV library found inside package. Using it!");
+            loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
     }
 
 
@@ -215,6 +245,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         matResult = matInput;
 
         // 필터링
+        /*if(RGBA == 1) {
+            matResult = matInput;
+        }*/
         if(GrayScale == 1) {
             ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }

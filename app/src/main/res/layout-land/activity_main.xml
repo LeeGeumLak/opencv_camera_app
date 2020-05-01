@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:ignore="MissingDefaultResource">
 
     <org.opencv.android.JavaCameraView
         android:id="@+id/camera_view"
@@ -98,6 +99,7 @@
         android:textSize="13dp" />
 
     <Button
+        android:visibility="gone"
         android:id="@+id/Button_capture"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -110,23 +112,3 @@
 
 
 </RelativeLayout>
-<!--<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:opencv="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-
-    android:orientation="vertical"
-    tools:context=".MainActivity">
-
-    <org.opencv.android.JavaCameraView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        opencv:camera_id="any"
-        android:visibility="gone"
-        android:id="@+id/activity_surface_view" />
-
-</LinearLayout>-->
-

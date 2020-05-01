@@ -67,6 +67,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation project(path: ':opencv')
 
+
     // airbnb lottie api
     implementation 'com.airbnb.android:lottie:3.4.0'
 
