@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
@@ -31,6 +32,8 @@ import java.util.Date;
 import java.util.List;
 
 import static android.Manifest.permission.CAMERA;
+import static android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
+import static android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 
@@ -38,8 +41,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = "MainActivity";
     private Button Button_RGB, Button_Gray, Button_HSV, Button_Text, Button_capture, Button_Sticker;
+    private Button Button_change, Button_filter;
+
     private Mat matInput, matResult;
     private int GrayScale, RGBA, HSV;
+
+    private int camera_facing_id;
 
     private Uri fileUri;
     private int REQUEST_IMAGE_CAPTURE = 672;
@@ -92,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_Sticker = findViewById(R.id.Button_Sticker);
 
         Button_capture = findViewById(R.id.Button_capture);
-
+        Button_change = findViewById(R.id.Button_change);
+        Button_filter = findViewById(R.id.Button_filter);
 
         Button_RGB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +145,29 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
+        Button_change.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if( camera_facing_id == CAMERA_FACING_BACK ) {
+                    Toast.makeText(getApplicationContext(), "셀카 모드", Toast.LENGTH_SHORT).show();
+                    openCvCameraView.setCvCameraViewListener(MainActivity.this);
+                    openCvCameraView.setCameraIndex(CAMERA_FACING_FRONT); // 전면 카메라(셀카) 모드
+                }
+                if( camera_facing_id == CAMERA_FACING_FRONT) {
+                    Toast.makeText(getApplicationContext(), "카메라 모드", Toast.LENGTH_SHORT).show();
+                    openCvCameraView.setCvCameraViewListener(MainActivity.this);
+                    openCvCameraView.setCameraIndex(CAMERA_FACING_BACK); // 후면 카메라 모드
+                }
+            }
+        });
+
+        Button_filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO : sliding 애니메이션 추가해서 필터들 나오게끔
+            }
+        });
+
         // 카메라 찍기
         Button_capture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,7 +188,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
-        openCvCameraView.setCameraIndex(0); // front-camera(1),  back-camera(0)
+        openCvCameraView.setCameraIndex(CAMERA_FACING_BACK); // 후면 카메라 모드
+        camera_facing_id = CAMERA_FACING_BACK;
     }
 
     
