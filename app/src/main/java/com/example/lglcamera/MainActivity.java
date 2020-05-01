@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }
-                Toast.makeText(getApplicationContext(), "take picture", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
                 
             }
         });
