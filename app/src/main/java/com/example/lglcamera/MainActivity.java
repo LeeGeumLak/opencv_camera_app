@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private Mat matInput, matResult;
     private int GrayScale, RGBA, HSV;
 
-    private int camera_facing_id;
+    private int cameraId = 0;
 
     private Uri fileUri;
     private int REQUEST_IMAGE_CAPTURE = 672;
@@ -148,16 +148,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if( camera_facing_id == CAMERA_FACING_BACK ) {
-                    Toast.makeText(getApplicationContext(), "셀카 모드", Toast.LENGTH_SHORT).show();
-                    openCvCameraView.setCvCameraViewListener(MainActivity.this);
-                    openCvCameraView.setCameraIndex(CAMERA_FACING_FRONT); // 전면 카메라(셀카) 모드
-                }
-                if( camera_facing_id == CAMERA_FACING_FRONT) {
-                    Toast.makeText(getApplicationContext(), "카메라 모드", Toast.LENGTH_SHORT).show();
-                    openCvCameraView.setCvCameraViewListener(MainActivity.this);
-                    openCvCameraView.setCameraIndex(CAMERA_FACING_BACK); // 후면 카메라 모드
-                }
+                swapCamera();
             }
         });
 
@@ -189,10 +180,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
         openCvCameraView.setCameraIndex(CAMERA_FACING_BACK); // 후면 카메라 모드
-        camera_facing_id = CAMERA_FACING_BACK;
+        cameraId = CAMERA_FACING_BACK;
     }
 
-    
+    private void swapCamera() {
+        cameraId = cameraId^1; //bitwise not operation to flip 1 to 0 and vice versa
+        openCvCameraView.disableView();
+        openCvCameraView.setCameraIndex(cameraId);
+        openCvCameraView.enableView();
+    }
 
     private static Uri getOutputMediaFileUri(int type){
         // 아래 capture한 사진이 저장될 file 공간을 생성하는 method를 통해 반환되는 File의 URI를 반환
