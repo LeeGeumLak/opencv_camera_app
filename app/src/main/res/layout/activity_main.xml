@@ -1,19 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/sample_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/camera_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/Button_Sticker"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_Text"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="667dp"
+        android:layout_marginRight="667dp"
+        android:background="#7d010000"
+        android:text="Sticker"
+        android:textColor="#ffffff"
+        android:textSize="13dp" />
+
+    <Button
+        android:id="@+id/Button_Text"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_RGB"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="667dp"
+        android:layout_marginRight="667dp"
+        android:background="#7d010000"
+        android:text="Text"
+        android:textColor="#ffffff"
+        android:textSize="13dp" />
+
+    <Button
+        android:id="@+id/Button_RGB"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_Gray"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="667dp"
+        android:layout_marginRight="667dp"
+        android:background="#7d010000"
+        android:text="RGB"
+        android:textColor="#ffffff"
+        android:textSize="13dp" />
+
+    <Button
+        android:id="@+id/Button_HSV"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="667dp"
+        android:layout_marginRight="667dp"
+        android:background="#7d010000 "
+        android:text="HSV"
+        android:textColor="#ffffff"
+        android:textSize="13dp" />
+
+    <Button
+        android:id="@+id/Button_Gray"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_HSV"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="667dp"
+        android:layout_marginRight="667dp"
+        android:background="#7d010000"
+        android:text="Gray"
+        android:textColor="#ffffff"
+        android:textSize="13dp" />
+
+    <Button
+        android:id="@+id/Button_capture"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginTop="180dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/camera_ok" />
+
+
+</RelativeLayout>
+<!--<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <org.opencv.android.JavaCameraView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        opencv:camera_id="any"
+        android:visibility="gone"
+        android:id="@+id/activity_surface_view" />
+
+</LinearLayout>-->
+
