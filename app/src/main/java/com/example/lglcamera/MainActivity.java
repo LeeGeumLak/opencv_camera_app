@@ -55,23 +55,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
 
-    private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(int status) {
-            switch (status) {
-                case LoaderCallbackInterface.SUCCESS: {
-                    openCvCameraView.enableView();
-                }
-                break;
-                default: {
-                    super.onManagerConnected(status);
-                }
-                break;
-            }
-        }
-    };
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         setContentView(R.layout.activity_main);
 
-        // 버튼 create
+
         Button_RGB = findViewById(R.id.Button_RGB);
         Button_Gray = findViewById(R.id.Button_Gray);
         Button_HSV = findViewById(R.id.Button_HSV);
@@ -94,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_capture = findViewById(R.id.Button_capture);
 
 
-        // 버튼 listener
         Button_RGB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,12 +124,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_capture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
-                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
-                if (takePicture.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }
                 Toast.makeText(getApplicationContext(), "take picture", Toast.LENGTH_SHORT).show();
                 
@@ -204,19 +186,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             openCvCameraView.disableView();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "onResume :: Internal OpenCV library not found.");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, loaderCallback);
-        } else {
-            Log.d(TAG, "onResume :: OpenCV library found inside package. Using it!");
-            loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
-    }
-
 
     public void onDestroy() {
         super.onDestroy();
@@ -246,9 +215,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         matResult = matInput;
 
         // 필터링
-        /*if(RGBA == 1) {
-            matResult = matInput;
-        }*/
         if(GrayScale == 1) {
             ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }

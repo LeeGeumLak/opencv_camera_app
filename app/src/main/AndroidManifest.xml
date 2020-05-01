@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.lglcamera">
-    <!-- permission -->
-    <!-- camera -->
+
+    <!-- camera permission -->
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature
@@ -17,7 +17,9 @@
         android:required="false" />
     <uses-feature
         android:name="android.hardware.camera.front.autofocus"
-        android:required="false" /> <!-- storage -->
+        android:required="false" />
+
+    <!-- storage permission-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -35,19 +37,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".TextifyActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".LoadingActivity">
+        <activity
+
+            android:name=".LoadingActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -61,7 +70,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             -->
-        </activity> <!-- 사진 촬영을 위한 provide -->
+        </activity>
+
+        <!-- 사진 촬영을 위한 provide -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.lglcamera.provider"
