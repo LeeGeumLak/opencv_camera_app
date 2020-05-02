@@ -41,16 +41,11 @@ public class TextifyActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        buttonInit();
-
-        tessBaseAPI = new TessBaseAPI();
-        String dir = getFilesDir() + "/tesseract";
-        if(checkLanguageFile(dir+"/tessdata"))
-            tessBaseAPI.init(dir, "eng");
+        init();
     }
 
-    // 버튼 초기화 및 리스너 설정
-    private void buttonInit() {
+    // 버튼 초기화 및 리스너 설정, API 설정
+    private void init() {
         imageView = findViewById(R.id.imageView);
         surfaceView = findViewById(R.id.surfaceView);
         textView = findViewById(R.id.textView);
@@ -62,6 +57,11 @@ public class TextifyActivity extends AppCompatActivity {
                 capture();
             }
         });
+
+        tessBaseAPI = new TessBaseAPI();
+        String dir = getFilesDir() + "/tesseract";
+        if(checkLanguageFile(dir+"/tessdata"))
+            tessBaseAPI.init(dir, "eng");
     }
 
     boolean checkLanguageFile(String dir) {
