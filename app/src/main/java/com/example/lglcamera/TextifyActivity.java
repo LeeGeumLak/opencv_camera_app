@@ -9,6 +9,7 @@ import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,6 +36,21 @@ public class TextifyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_textify);
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        buttonInit();
+
+        tessBaseAPI = new TessBaseAPI();
+        String dir = getFilesDir() + "/tesseract";
+        if(checkLanguageFile(dir+"/tessdata"))
+            tessBaseAPI.init(dir, "eng");
+    }
+
+    // 버튼 초기화 및 리스너 설정
+    private void buttonInit() {
         imageView = findViewById(R.id.imageView);
         surfaceView = findViewById(R.id.surfaceView);
         textView = findViewById(R.id.textView);
@@ -46,11 +62,6 @@ public class TextifyActivity extends AppCompatActivity {
                 capture();
             }
         });
-
-        tessBaseAPI = new TessBaseAPI();
-        String dir = getFilesDir() + "/tesseract";
-        if(checkLanguageFile(dir+"/tessdata"))
-            tessBaseAPI.init(dir, "eng");
     }
 
     boolean checkLanguageFile(String dir) {
@@ -58,7 +69,8 @@ public class TextifyActivity extends AppCompatActivity {
         if(!file.exists() && file.mkdirs())
             createFiles(dir);
         else if(file.exists()){
-            String filePath = dir + "/eng.traineddata";
+            String filePath = dir + "/eng.traineddata"; // 영어
+                                                        // 한글 : /kor.traineddata
             File langDataFile = new File(filePath);
             if(!langDataFile.exists())
                 createFiles(dir);
@@ -66,6 +78,7 @@ public class TextifyActivity extends AppCompatActivity {
         return true;
     }
 
+    // TODO : 번역 잘 안됨 --> 파일 읽어오는 과정에서 문제 예정
     private void createFiles(String dir) {
         AssetManager assetMgr = this.getAssets();
 
