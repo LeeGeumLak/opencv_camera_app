@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
@@ -39,6 +38,7 @@ import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final String TAG = "MainActivity";
+
     private Button Button_RGB, Button_Gray, Button_HSV, Button_Text, Button_capture, Button_Sticker;
     private Button Button_change, Button_filter;
 
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private CameraBridgeViewBase openCvCameraView;
 
+    // Native c++ 메서드
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
 
@@ -59,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         System.loadLibrary("opencv_java4");
         System.loadLibrary("native-lib");
     }
-
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -89,7 +89,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         setContentView(R.layout.activity_main);
 
+        buttonInit();
 
+        // 권한 설정 후, 카메라 실행
+        openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
+        openCvCameraView.setVisibility(SurfaceView.VISIBLE);
+        openCvCameraView.setCvCameraViewListener(this);
+        openCvCameraView.setCameraIndex(CAMERA_FACING_BACK); // 후면 카메라 모드
+        cameraId = CAMERA_FACING_BACK;
+    }
+
+    // 버튼 초기화 및 리스너 설정
+    private void buttonInit() {
         Button_RGB = findViewById(R.id.Button_RGB);
         Button_Gray = findViewById(R.id.Button_Gray);
         Button_HSV = findViewById(R.id.Button_HSV);
@@ -158,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-        // 카메라 찍기
+        // 카메라 찍기 버튼 리스너
         Button_capture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,18 +181,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }
                 Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
-                
+
             }
         });
-
-        // 권한 설정 후, 카메라 실행
-        openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
-        openCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        openCvCameraView.setCvCameraViewListener(this);
-        openCvCameraView.setCameraIndex(CAMERA_FACING_BACK); // 후면 카메라 모드
-        cameraId = CAMERA_FACING_BACK;
     }
 
+    // 전/후면 카메라 전환 메서드
     private void swapCamera() {
         cameraId = cameraId^1; // 카메라 방향 바꾸기 ==> 기존 camera id에 1 과 비트연산하여 1 / 0 결과 나오게끔
         openCvCameraView.disableView();
@@ -226,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     @Override
     public void onPause() {
         super.onPause();
+
         if (openCvCameraView != null)
             openCvCameraView.disableView();
     }
@@ -261,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     }
 
+    // inputFrame 에 filter 씌어서 outputFrame 으로 return
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         matInput = inputFrame.rgba();
@@ -335,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-
+    // 카메라 권한 설정 창
     @TargetApi(Build.VERSION_CODES.M)
     private void showDialogForPermission(String msg) {
 
