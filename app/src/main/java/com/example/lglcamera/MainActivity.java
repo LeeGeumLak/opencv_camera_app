@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }
 
     private void swapCamera() {
-        cameraId = cameraId^1; //bitwise not operation to flip 1 to 0 and vice versa
+        cameraId = cameraId^1; // 카메라 방향 바꾸기 ==> 기존 camera id에 1 과 비트연산하여 1 / 0 결과 나오게끔
         openCvCameraView.disableView();
         openCvCameraView.setCameraIndex(cameraId);
         openCvCameraView.enableView();
