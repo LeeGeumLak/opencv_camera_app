@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".MainActivity"
     tools:ignore="MissingDefaultResource">
 
@@ -11,6 +12,8 @@
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="100dp"
         android:visibility="gone"/>
 
     <Button
