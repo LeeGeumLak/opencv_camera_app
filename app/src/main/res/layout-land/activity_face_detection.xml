@@ -38,9 +38,8 @@
             android:id="@+id/switchbutton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@drawable/mybutoon"
             android:layout_weight="3"
-            android:text="@string/Arrow"
+            android:text="Arrow"
             android:textColor="#0073ff"/>
 
         <Space
@@ -52,9 +51,7 @@
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:text="@string/string_Capture"
-            android:layout_weight="10"
-            android:background="@drawable/mybutoon" />
+            android:layout_weight="10"/>
 
         <Space
             android:layout_width="match_parent"
@@ -67,7 +64,6 @@
             android:layout_height="0dp"
             android:layout_weight="3"
             android:text="OCR"
-            android:background="@drawable/mybutoon"
             android:textSize="6pt"
             android:textColor="#ff8400"/>
 
