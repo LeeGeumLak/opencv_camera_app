@@ -31,8 +31,8 @@ float resize(Mat img_src, Mat &img_resize, int resize_width){
 }
 
 extern "C"
-JNIEXPORT jlong JNICALL Java_hoeun_opencv_1ndk_MainActivity_loadCascade
-        (JNIEnv *env, jobject type, jstring cascadeFileName_){
+JNIEXPORT jlong JNICALL
+FaceDetectionActivity.loadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
     const char *nativeFileNameString = env->GetStringUTFChars(cascadeFileName_, 0);
     string baseDir("/storage/emulated/0/");
     baseDir.append(nativeFileNameString);
@@ -51,8 +51,8 @@ JNIEXPORT jlong JNICALL Java_hoeun_opencv_1ndk_MainActivity_loadCascade
 }
 
 extern "C"
-JNIEXPORT void JNICALL Java_hoeun_opencv_1ndk_MainActivity_detect
-        (JNIEnv *env, jobject type, jlong cascadeClassifier_face, jlong cascadeClassifier_eye, jlong matAddrInput, jlong matAddrResult){
+JNIEXPORT void JNICALL
+FaceDetectionActivity.detect (JNIEnv *env, jobject type, jlong cascadeClassifier_face, jlong cascadeClassifier_eye, jlong matAddrInput, jlong matAddrResult){
     Mat &img_input = *(Mat *) matAddrInput;
     Mat &img_result = *(Mat *) matAddrResult;
     img_result = img_input.clone();
