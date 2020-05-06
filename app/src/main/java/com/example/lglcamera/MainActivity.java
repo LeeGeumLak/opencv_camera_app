@@ -176,6 +176,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_capture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
@@ -183,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }
-                Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+
 
             }
         });
@@ -199,6 +201,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static Uri getOutputMediaFileUri(int type){
         // 아래 capture한 사진이 저장될 file 공간을 생성하는 method를 통해 반환되는 File의 URI를 반환
+        // TODO : error
+        // error : java.lang.NullPointerException: file
         return Uri.fromFile(getOutputMediaFile(type));
     }
 

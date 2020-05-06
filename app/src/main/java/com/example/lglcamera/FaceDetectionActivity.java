@@ -166,6 +166,8 @@ public class FaceDetectionActivity extends AppCompatActivity
                     path.mkdirs();
                     File file = new File(path, "image.png");
                     String filename = file.toString();
+                    // TODO : error
+                    // error : java.lang.NullPointerException: Attempt to read from field 'long org.opencv.core.Mat.nativeObj' on a null object reference
                     Imgproc.cvtColor(matResult, matResult, Imgproc.COLOR_BGR2RGB, 4);
                     boolean ret = Imgcodecs.imwrite( filename, matResult);
                     if ( ret ) Log.d(TAG, "SUCESS");
