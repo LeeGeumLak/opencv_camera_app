@@ -151,7 +151,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         openCvCameraView.setCameraIndex(0); // front-camera(1), back-camera(0) 후면 카메라 사용
         cameraType = 0;
 
-        loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        //loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
 
     // 전/후면 카메라 전환 메서드
