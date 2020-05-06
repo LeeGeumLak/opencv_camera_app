@@ -44,6 +44,7 @@ public class FaceDetectionActivity extends AppCompatActivity
     private Mat matResult;
     private int cameraType = 0;
 
+    // Native c++ 메서드
     public native long loadCascade(String cascadeFileName );
     public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long matAddrInput, long matAddrResult);
 
@@ -66,7 +67,9 @@ public class FaceDetectionActivity extends AppCompatActivity
     private void copyFile(String filename) {
         String baseDir = Environment.getExternalStorageDirectory().getPath();
         String pathDir = baseDir + File.separator + filename;
+
         AssetManager assetManager = this.getAssets();
+
         InputStream inputStream = null;
         OutputStream outputStream = null;
 
@@ -74,27 +77,36 @@ public class FaceDetectionActivity extends AppCompatActivity
             Log.d( TAG, "copyFile : 다음 경로로 파일복사 "+ pathDir);
             inputStream = assetManager.open(filename);
             outputStream = new FileOutputStream(pathDir);
+
             byte[] buffer = new byte[1024];
             int read;
+
             while ((read = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, read);
             }
+
             inputStream.close();
             inputStream = null;
             outputStream.flush();
             outputStream.close();
             outputStream = null;
+
         } catch (Exception e) {
             Log.d(TAG, "copyFile : 파일 복사 중 예외 발생 "+e.toString() );
         }
     }
 
     private void read_cascade_file(){
+        // Assets에서 파일 가져와 복사
         copyFile("haarcascade_frontalface_alt.xml");
         copyFile("haarcascade_eye_tree_eyeglasses.xml");
+
         Log.d(TAG, "read_cascade_file:");
+
+        // 외부 저장소에서 파일 읽어와 객체 로드
         cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
+
         cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
     }
 
@@ -127,6 +139,7 @@ public class FaceDetectionActivity extends AppCompatActivity
 
         buttonInit();
 
+        // xml 파일 읽어와 객체 로드
         read_cascade_file();
 
         openCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
@@ -135,7 +148,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         openCvCameraView.setCameraIndex(0); // front-camera(1), back-camera(0) 후면 카메라 사용
         cameraType = 0;
 
-        loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        //loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
 
     // 전/후면 카메라 전환 메서드
@@ -230,6 +243,7 @@ public class FaceDetectionActivity extends AppCompatActivity
                 matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
             }
 
+            // 영상 180도 회전
             Core.flip(matInput, matInput, 1);
             detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
                     matResult.getNativeObjAddr());

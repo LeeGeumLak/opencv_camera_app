@@ -60,7 +60,8 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
     equalizeHist(img_gray, img_gray);
     Mat img_resize;
     float resizeRatio = resize(img_gray, img_resize, 640);
-//-- Detect faces
+
+    //-- Detect faces
     ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces, 1.1, 2, 0|CASCADE_SCALE_IMAGE, Size(30, 30) );
     __android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ",
                         (char *) "face %d found ", faces.size());
@@ -75,13 +76,13 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
         Rect face_area(real_facesize_x, real_facesize_y, real_facesize_width,real_facesize_height);
         Mat faceROI = img_gray( face_area );
         std::vector<Rect> eyes;
-//-- In each face, detect eyes
+
+        //-- In each face, detect eyes
         ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CASCADE_SCALE_IMAGE, Size(30, 30) );
-        for ( size_t j = 0; j < eyes.size(); j++ )
-        {
-//Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
-//int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
-//circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
+        for ( size_t j = 0; j < eyes.size(); j++ ) {
+            //Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
+            //int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+            //circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
         }
     }
 }
