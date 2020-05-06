@@ -1,20 +1,13 @@
 package com.example.lglcamera;
 
 //기본 패키지
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.SurfaceView;
@@ -133,17 +126,8 @@ public class FaceDetectionActivity extends AppCompatActivity
         setContentView(R.layout.activity_face_detection);
 
         buttonInit();
-        /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //퍼미션 상태 확인
-            if (!hasPermissions(PERMISSIONS)) {
-                //퍼미션 허가 안되어있다면 사용자에게 요청
-                requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE);
-            }
-            else read_cascade_file(); //추가
-        }
-        else read_cascade_file(); //추가
-        */
+
+        read_cascade_file();
 
         openCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -151,7 +135,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         openCvCameraView.setCameraIndex(0); // front-camera(1), back-camera(0) 후면 카메라 사용
         cameraType = 0;
 
-        //loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
 
     // 전/후면 카메라 전환 메서드
@@ -245,8 +229,8 @@ public class FaceDetectionActivity extends AppCompatActivity
             }
 
             Core.flip(matInput, matInput, 1);
-
-            detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+            detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
+                    matResult.getNativeObjAddr());
 
         } catch (InterruptedException e) {
             e.printStackTrace();
