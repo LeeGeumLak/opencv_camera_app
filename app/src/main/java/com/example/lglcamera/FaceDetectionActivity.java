@@ -105,10 +105,10 @@ public class FaceDetectionActivity extends AppCompatActivity
         Log.d(TAG, "read_cascade_file:");
 
         // 외부 저장소에서 파일 읽어와 객체 로드
-        cascadeClassifier_face = loadCascade( "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/haarcascade_frontalface_alt.xml");
+        cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
 
-        cascadeClassifier_eye = loadCascade( "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/haarcascade_eye_tree_eyeglasses.xml");
+        cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
     }
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
@@ -174,10 +174,16 @@ public class FaceDetectionActivity extends AppCompatActivity
 
         Button_capture.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                //Log.d(TAG, "capture : before try");
+
                 try {
                     Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+                    //Log.d(TAG, "capture : after try");
 
                     getWriteLock();
+
+                    //Log.d(TAG, "capture : after getWriteLock()");
+
                     File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
                     path.mkdirs();
                     File file = new File(path, "image.png");
@@ -239,11 +245,11 @@ public class FaceDetectionActivity extends AppCompatActivity
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         try {
-            System.out.println("before getWriteLock()");
+            Log.d(TAG, "before getWriteLock()");
 
             getWriteLock();
 
-            System.out.println("after getWriteLock()");
+            Log.d(TAG, "after getWriteLock()");
 
             matInput = inputFrame.rgba();
 
@@ -254,22 +260,22 @@ public class FaceDetectionActivity extends AppCompatActivity
             // 영상 180도 회전
             Core.flip(matInput, matInput, 1);
 
-            System.out.println("after rotate screen / before detect()");
+            Log.d(TAG, "after rotate screen / before detect()");
 
             detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
                     matResult.getNativeObjAddr());
 
-            System.out.println("after detect()");
+            Log.d(TAG, "after detect()");
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        System.out.println("before releaseWriteLock()");
+        Log.d(TAG, "before releaseWriteLock()");
 
         releaseWriteLock();
 
-        System.out.println("after releaseWriteLock()");
+        Log.d(TAG, "after releaseWriteLock()");
 
         return matResult;
     }

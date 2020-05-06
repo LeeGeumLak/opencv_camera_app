@@ -67,7 +67,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             -->
-        </activity> <!-- 사진 촬영을 위한 provide -->
+        </activity>
+
+        <!-- 사진 촬영을 위한 provide -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.lglcamera.provider"

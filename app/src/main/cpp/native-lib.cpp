@@ -44,7 +44,11 @@ Java_com_example_lglcamera_FaceDetectionActivity_loadCascade(JNIEnv *env, jobjec
     }
     else
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","CascadeClassifier로 로딩 성공 %s", nativeFileNameString);
+
     env->ReleaseStringUTFChars(cascadeFileName_, nativeFileNameString);
+
+    //__android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "return %s", nativeFileNameString);
+
     return ret;
 }
 

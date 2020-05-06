@@ -1,6 +1,7 @@
 package com.example.lglcamera;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -90,6 +91,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.activity_main);
+
+        // URI exposure 를 무시
+       /* StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());*/
 
         buttonInit();
 
@@ -199,12 +204,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         openCvCameraView.enableView();
     }
 
-    private static Uri getOutputMediaFileUri(int type){
+    private Uri getOutputMediaFileUri(int type){
         // 아래 capture한 사진이 저장될 file 공간을 생성하는 method를 통해 반환되는 File의 URI를 반환
 
         // TODO : error
         // error : java.lang.NullPointerException: file
-        return Uri.fromFile(getOutputMediaFile(type));
+        return FileProvider.getUriForFile(getApplicationContext(), "com.example.lglcamera.provider", getOutputMediaFile(type));
+        //return Uri.fromFile(getOutputMediaFile(type));
     }
 
     private static File getOutputMediaFile(int type){
