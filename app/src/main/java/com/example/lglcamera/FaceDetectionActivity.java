@@ -49,7 +49,7 @@ public class FaceDetectionActivity extends AppCompatActivity
 
     private Mat matInput;
     private Mat matResult;
-    private int cameraType = 1;
+    private int cameraType = 0;
 
     public native long loadCascade(String cascadeFileName );
     public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long matAddrInput, long matAddrResult);
@@ -98,7 +98,7 @@ public class FaceDetectionActivity extends AppCompatActivity
 
     private void read_cascade_file(){
         copyFile("haarcascade_frontalface_alt.xml");
-        copyFile("haarcascade_eye_tree_eyeglasses.xm");
+        copyFile("haarcascade_eye_tree_eyeglasses.xml");
         Log.d(TAG, "read_cascade_file:");
         cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
@@ -133,7 +133,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         setContentView(R.layout.activity_face_detection);
 
         buttonInit();
-        
+        /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //퍼미션 상태 확인
             if (!hasPermissions(PERMISSIONS)) {
@@ -143,12 +143,15 @@ public class FaceDetectionActivity extends AppCompatActivity
             else read_cascade_file(); //추가
         }
         else read_cascade_file(); //추가
+        */
 
         openCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
         openCvCameraView.setCameraIndex(0); // front-camera(1), back-camera(0) 후면 카메라 사용
-        loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        cameraType = 0;
+
+        //loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
 
     // 전/후면 카메라 전환 메서드
@@ -242,8 +245,8 @@ public class FaceDetectionActivity extends AppCompatActivity
             }
 
             Core.flip(matInput, matInput, 1);
-            detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
-                    matResult.getNativeObjAddr());
+
+            detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -252,70 +255,5 @@ public class FaceDetectionActivity extends AppCompatActivity
         releaseWriteLock();
 
         return matResult;
-    }
-
-    //여기서부턴 퍼미션 관련 메소드
-    static final int PERMISSIONS_REQUEST_CODE = 1000;
-
-    String[] PERMISSIONS = {"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
-
-    private boolean hasPermissions(String[] permissions) {
-        int result;
-
-        //스트링 배열에 있는 퍼미션들의 허가 상태 여부 확인
-        for (String perms : permissions){
-            result = ContextCompat.checkSelfPermission(this, perms);
-            if (result == PackageManager.PERMISSION_DENIED){
-
-                //허가 안된 퍼미션 발견
-                return false;
-            }
-        }
-
-        //모든 퍼미션이 허가되었음
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-            case PERMISSIONS_REQUEST_CODE:
-                if (grantResults.length > 0) {
-                    boolean cameraPermissionAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    boolean writePermissionAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-
-                    if (!cameraPermissionAccepted || !writePermissionAccepted) {
-                        showDialogForPermission("앱을 실행하려면 권한 설정을 하셔야합니다.");
-
-                        return;
-                    }
-                    else {
-                        read_cascade_file();
-                    }
-                }
-                break;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private void showDialogForPermission(String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder( FaceDetectionActivity.this);
-        builder.setTitle("알림");
-        builder.setMessage(msg);
-        builder.setCancelable(false);
-        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id){
-                requestPermissions(PERMISSIONS, PERMISSIONS_REQUEST_CODE);
-            }
-        });
-        builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface arg0, int arg1) {
-                finish();
-            }
-        });
-
-        builder.create().show();
     }
 }
