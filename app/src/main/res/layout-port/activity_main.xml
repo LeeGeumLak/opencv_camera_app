@@ -126,7 +126,7 @@
         android:layout_marginBottom="20dp"
         android:background="@drawable/camera_change" />
 
-    <Button
+    <!--<Button
         android:id="@+id/Button_filter"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -135,6 +135,6 @@
         android:layout_marginEnd="281dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/filter_change" />
+        android:background="@drawable/filter_change" />-->
 
 </RelativeLayout>

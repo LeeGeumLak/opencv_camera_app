@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         Button_capture = findViewById(R.id.Button_capture);
         Button_change = findViewById(R.id.Button_change);
-        Button_filter = findViewById(R.id.Button_filter);
+        //Button_filter = findViewById(R.id.Button_filter);
 
         Button_RGB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,12 +166,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-        Button_filter.setOnClickListener(new View.OnClickListener() {
+        /*Button_filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO : sliding 애니메이션 추가해서 필터들 나오게끔
             }
-        });
+        });*/
 
         // 카메라 찍기 버튼 리스너
         Button_capture.setOnClickListener(new View.OnClickListener() {
@@ -202,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static Uri getOutputMediaFileUri(int type){
         // 아래 capture한 사진이 저장될 file 공간을 생성하는 method를 통해 반환되는 File의 URI를 반환
+
         // TODO : error
         // error : java.lang.NullPointerException: file
         return Uri.fromFile(getOutputMediaFile(type));
@@ -211,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         // 외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "LGL_Camera");
-
 
         // 폴더 없으면 생성
         if (!mediaStorageDir.exists()){

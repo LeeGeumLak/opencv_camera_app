@@ -14,6 +14,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 //openCV 패키지
 import org.opencv.android.BaseLoaderCallback;
@@ -104,10 +105,10 @@ public class FaceDetectionActivity extends AppCompatActivity
         Log.d(TAG, "read_cascade_file:");
 
         // 외부 저장소에서 파일 읽어와 객체 로드
-        cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
+        cascadeClassifier_face = loadCascade( "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
 
-        cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
+        cascadeClassifier_eye = loadCascade( "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/haarcascade_eye_tree_eyeglasses.xml");
     }
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
@@ -174,6 +175,8 @@ public class FaceDetectionActivity extends AppCompatActivity
         Button_capture.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
+                    Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+
                     getWriteLock();
                     File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
                     path.mkdirs();
@@ -236,7 +239,12 @@ public class FaceDetectionActivity extends AppCompatActivity
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         try {
+            System.out.println("before getWriteLock()");
+
             getWriteLock();
+
+            System.out.println("after getWriteLock()");
+
             matInput = inputFrame.rgba();
 
             if ( matResult == null ) {
@@ -245,14 +253,23 @@ public class FaceDetectionActivity extends AppCompatActivity
 
             // 영상 180도 회전
             Core.flip(matInput, matInput, 1);
+
+            System.out.println("after rotate screen / before detect()");
+
             detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
                     matResult.getNativeObjAddr());
+
+            System.out.println("after detect()");
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        System.out.println("before releaseWriteLock()");
+
         releaseWriteLock();
+
+        System.out.println("after releaseWriteLock()");
 
         return matResult;
     }

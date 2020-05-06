@@ -50,7 +50,9 @@ Java_com_example_lglcamera_FaceDetectionActivity_loadCascade(JNIEnv *env, jobjec
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject type, jlong cascadeClassifier_face, jlong cascadeClassifier_eye, jlong matAddrInput, jlong matAddrResult){
+Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
+        jlong cascadeClassifier_eye, jlong matAddrInput, jlong matAddrResult) {
+
     Mat &img_input = *(Mat *) matAddrInput;
     Mat &img_result = *(Mat *) matAddrResult;
     img_result = img_input.clone();
@@ -80,9 +82,9 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
         //-- In each face, detect eyes
         ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CASCADE_SCALE_IMAGE, Size(30, 30) );
         for ( size_t j = 0; j < eyes.size(); j++ ) {
-            //Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
-            //int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
-            //circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
+            Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
+            int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+            circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
         }
     }
 }
