@@ -32,7 +32,7 @@ float resize(Mat img_src, Mat &img_resize, int resize_width){
 
 extern "C"
 JNIEXPORT jlong JNICALL
-FaceDetectionActivity.loadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
+Java_com_example_lglcamera_FaceDetectionActivity_loadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
     const char *nativeFileNameString = env->GetStringUTFChars(cascadeFileName_, 0);
     string baseDir("/storage/emulated/0/");
     baseDir.append(nativeFileNameString);
@@ -40,19 +40,17 @@ FaceDetectionActivity.loadCascade(JNIEnv *env, jobject type, jstring cascadeFile
     jlong ret = 0;
     ret = (jlong) new CascadeClassifier(pathDir);
     if (((CascadeClassifier *) ret)->empty()) {
-        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ",
-                            "CascadeClassifier로 로딩 실패 %s", nativeFileNameString);
+        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","CascadeClassifier로 로딩 실패 %s", nativeFileNameString);
     }
     else
-        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ",
-                            "CascadeClassifier로 로딩 성공 %s", nativeFileNameString);
+        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","CascadeClassifier로 로딩 성공 %s", nativeFileNameString);
     env->ReleaseStringUTFChars(cascadeFileName_, nativeFileNameString);
     return ret;
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-FaceDetectionActivity.detect (JNIEnv *env, jobject type, jlong cascadeClassifier_face, jlong cascadeClassifier_eye, jlong matAddrInput, jlong matAddrResult){
+Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject type, jlong cascadeClassifier_face, jlong cascadeClassifier_eye, jlong matAddrInput, jlong matAddrResult){
     Mat &img_input = *(Mat *) matAddrInput;
     Mat &img_result = *(Mat *) matAddrResult;
     img_result = img_input.clone();

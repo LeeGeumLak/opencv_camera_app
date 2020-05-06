@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = "MainActivity";
 
-    private Button Button_RGB, Button_Gray, Button_HSV, Button_Text, Button_capture, Button_Sticker;
+    private Button Button_RGB, Button_Gray, Button_HSV, Button_Text, Button_capture, Button_sticker;
     private Button Button_change, Button_filter;
 
     private Mat matInput, matResult;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_HSV = findViewById(R.id.Button_HSV);
 
         Button_Text = findViewById(R.id.Button_Text);
-        Button_Sticker = findViewById(R.id.Button_Sticker);
+        Button_sticker = findViewById(R.id.Button_Sticker);
 
         Button_capture = findViewById(R.id.Button_capture);
         Button_change = findViewById(R.id.Button_change);
@@ -148,10 +148,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-        Button_Sticker.setOnClickListener(new View.OnClickListener() {
+        Button_sticker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO : 얼굴 인식
+
             }
         });
 
