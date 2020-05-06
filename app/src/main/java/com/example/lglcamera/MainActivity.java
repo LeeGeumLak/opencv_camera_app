@@ -25,12 +25,15 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import static android.Manifest.permission.CAMERA;
 import static android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private int cameraId = 0;
 
     private Uri fileUri;
+    private File file;
+    private String filename;
     private int REQUEST_IMAGE_CAPTURE = 672;
 
     private CameraBridgeViewBase openCvCameraView;
@@ -57,6 +62,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // Native c++ 메서드
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
+
+    private final Semaphore writeLock = new Semaphore(1);
+
+    public void getWriteLock() throws InterruptedException {
+        writeLock.acquire();
+    }
+    public void releaseWriteLock() {
+        writeLock.release();
+    }
 
     static {
         System.loadLibrary("opencv_java4");
@@ -183,14 +197,49 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
 
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                }
+                }*/
 
+                try {
+                    Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+                    //Log.d(TAG, "capture : after try");
+
+                    getWriteLock();
+
+                    //Log.d(TAG, "capture : after getWriteLock()");
+
+                    /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
+                    path.mkdirs();
+                    File file = new File(path, "image.png");
+                    String filename = file.toString();*/
+                    fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
+
+                    // TODO : error
+                    // error : java.lang.NullPointerException: Attempt to read from field 'long org.opencv.core.Mat.nativeObj' on a null object reference
+                    Imgproc.cvtColor(matResult, matResult, Imgproc.COLOR_BGR2RGB, 4);
+
+                    boolean ret = Imgcodecs.imwrite( filename, matResult);
+
+                    if ( ret ) {
+                        Log.d(TAG, "take pictureSUCCESS");
+                    }
+                    else {
+                        Log.d(TAG, "take picture FAIL");
+                    }
+
+                    Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    mediaScanIntent.setData(Uri.fromFile(file));
+                    sendBroadcast(mediaScanIntent);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                releaseWriteLock();
 
             }
         });
@@ -207,16 +256,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private Uri getOutputMediaFileUri(int type){
         // 아래 capture한 사진이 저장될 file 공간을 생성하는 method를 통해 반환되는 File의 URI를 반환
 
-        // TODO : error
-        // error : java.lang.NullPointerException: file
         return FileProvider.getUriForFile(getApplicationContext(), "com.example.lglcamera.provider", getOutputMediaFile(type));
         //return Uri.fromFile(getOutputMediaFile(type));
     }
 
-    private static File getOutputMediaFile(int type){
+    private File getOutputMediaFile(int type){
         // 외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "LGL_Camera");
+        /*File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "LGL_Camera");*/
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory() + "/Images/");
 
         // 폴더 없으면 생성
         if (!mediaStorageDir.exists()){
@@ -234,9 +282,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_"+ timeStamp + ".jpg");
+            filename = "IMG_"+ timeStamp + ".jpg";
         } else {
             return null;
         }
+
+        file = mediaStorageDir;
 
         return mediaFile;
     }
