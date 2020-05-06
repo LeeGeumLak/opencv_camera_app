@@ -98,7 +98,7 @@ public class FaceDetectionActivity extends AppCompatActivity
 
     private void read_cascade_file(){
         copyFile("haarcascade_frontalface_alt.xml");
-        copyFile("haarcascade_eye_tree_eyeglasses.xml");
+        copyFile("haarcascade_eye_tree_eyeglasses.xm");
         Log.d(TAG, "read_cascade_file:");
         cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
