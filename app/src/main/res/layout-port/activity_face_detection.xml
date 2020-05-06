@@ -1,84 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".FaceDetectionActivity"
-    android:orientation="horizontal"
     tools:ignore="MissingDefaultResource">
 
     <org.opencv.android.JavaCameraView
         android:id="@+id/activity_surface_view"
-        android:layout_width="0dp"
+
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="top"
-        android:layout_weight="100"/>
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="100dp"
+        android:visibility="gone" />
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:background="#000000"
-        android:layout_weight="1">
-    </LinearLayout>
+    <Button
+        android:id="@+id/Button_capture"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginTop="640dp"
+        android:layout_marginEnd="171dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/camera_ok" />
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="#000000"
-        android:layout_weight="6">
+    <Button
+        android:id="@+id/Button_change"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="640dp"
+        android:layout_marginEnd="61dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/camera_change" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
 
-        <Button
-            android:id="@+id/switchbutton"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3"
-            android:text="Arrow"
-            android:textColor="#0073ff"/>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="8"/>
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="10"/>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="8" />
-
-        <Button
-            android:id="@+id/OCRbutton"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3"
-            android:text="OCR"
-            android:textSize="6pt"
-            android:textColor="#ff8400"/>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:background="#000000"
-        android:layout_weight="2">
-    </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

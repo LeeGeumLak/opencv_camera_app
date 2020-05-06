@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.FaceDetector;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     openCvCameraView.enableView();
                 }
                 break;
+
                 default: {
                     super.onManagerConnected(status);
                 }
@@ -152,7 +154,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @Override
             public void onClick(View v) {
                 //TODO : 얼굴 인식
-
+                Intent sticker_intent = new Intent(MainActivity.this, FaceDetectionActivity.class);
+                startActivity(sticker_intent);
             }
         });
 
