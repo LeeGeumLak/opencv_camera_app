@@ -200,10 +200,12 @@ public class FaceDetectionActivity extends AppCompatActivity
 
                     // TODO : error
                     // error : java.lang.NullPointerException: Attempt to read from field 'long org.opencv.core.Mat.nativeObj' on a null object reference
-                    // 근본적인 문제 : E/OpenCV/StaticHelper: OpenCV error: Cannot load info library for OpenCV --> 카메라 화면이 뜨지 않음
-                    // 버전이 안맞는건가?
+                    // matResult가 초기화되지 않은 상태에서, 호출되었기 때문
+                    // ==> 근본적인 문제 : E/OpenCV/StaticHelper: OpenCV error: Cannot load info library for OpenCV --> 카메라 화면이 뜨지 않음 ( == matResult 가 초기화 되지 않았다는 뜻)
+                    // 버전이 안맞는건가? permission problem 은 아님
                     Imgproc.cvtColor(matResult, matResult, Imgproc.COLOR_BGR2RGB, 4);
 
+                    // 생성한 file에 matResult를 씌움
                     boolean ret = Imgcodecs.imwrite( filename, matResult);
 
                     if ( ret ) {
@@ -241,7 +243,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         // 폴더 없으면 생성
         if (!mediaStorageDir.exists()){
             // 예외처리
-            if (!mediaStorageDir.mkdirs()){ // 만약 mkdirs()가 제대로 동작하지 않을 경우, 오류 Log를 출력한 뒤, 해당 method 종료
+            if (!mediaStorageDir.mkdirs()){ // 폴더 생성하고, 만약 mkdirs()가 제대로 동작하지 않을 경우, Log 출력 및 종료
                 Log.d(TAG, "폴더 생성 실패");
                 return null;
             }

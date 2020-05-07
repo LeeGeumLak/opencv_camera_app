@@ -16,8 +16,7 @@ Java_com_example_lglcamera_MainActivity_stringFromJNI(
     return env->NewStringUTF(hello.c_str());
 }*/
 
-// rgb -> gray
-
+// image resize
 float resize(Mat img_src, Mat &img_resize, int resize_width){
     float scale = resize_width / (float)img_src.cols ;
     if (img_src.cols > resize_width) {
@@ -30,6 +29,7 @@ float resize(Mat img_src, Mat &img_resize, int resize_width){
     return scale;
 }
 
+// cascade file copy and load
 extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_example_lglcamera_FaceDetectionActivity_loadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
@@ -52,6 +52,7 @@ Java_com_example_lglcamera_FaceDetectionActivity_loadCascade(JNIEnv *env, jobjec
     return ret;
 }
 
+// face detect and circle
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
@@ -109,6 +110,7 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
 
 }
 
+// rgb -> gray
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_MainActivity_ConvertRGBtoGray(JNIEnv *env, jobject thiz,
