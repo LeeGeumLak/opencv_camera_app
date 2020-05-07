@@ -55,22 +55,35 @@ Java_com_example_lglcamera_FaceDetectionActivity_loadCascade(JNIEnv *env, jobjec
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
-        jlong cascadeClassifier_eye, jlong matAddrInput, jlong matAddrResult) {
+        jlong cascadeClassifier_eye, jlong mat_addr_Input, jlong mat_addr_Result) {
 
-    Mat &img_input = *(Mat *) matAddrInput;
-    Mat &img_result = *(Mat *) matAddrResult;
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
+
+    Mat &img_input = *(Mat *) mat_addr_Input;
+    Mat &img_result = *(Mat *) mat_addr_Result;
     img_result = img_input.clone();
+
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 2);
+
     std::vector<Rect> faces;
     Mat img_gray;
+
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 3);
+
     cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
     equalizeHist(img_gray, img_gray);
     Mat img_resize;
     float resizeRatio = resize(img_gray, img_resize, 640);
 
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 4);
+
     //-- Detect faces
     ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces, 1.1, 2, 0|CASCADE_SCALE_IMAGE, Size(30, 30) );
     __android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ",
                         (char *) "face %d found ", faces.size());
+
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 5);
+
     for (int i = 0; i < faces.size(); i++) {
         double real_facesize_x = faces[i].x / resizeRatio;
         double real_facesize_y = faces[i].y / resizeRatio;
@@ -91,6 +104,9 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
             circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
         }
     }
+
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);
+
 }
 
 extern "C"

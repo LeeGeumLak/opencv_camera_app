@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.util.Log;
 import android.view.SurfaceView;
@@ -29,9 +30,14 @@ import org.opencv.imgproc.Imgproc;
 //자바 패키지
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Semaphore;
+
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 public class FaceDetectionActivity extends AppCompatActivity
         implements CameraBridgeViewBase.CvCameraViewListener2 {
@@ -45,9 +51,13 @@ public class FaceDetectionActivity extends AppCompatActivity
     private Mat matResult;
     private int cameraType = 0;
 
+    private Uri fileUri;
+    private File file;
+    private String filename;
+
     // Native c++ 메서드
     public native long loadCascade(String cascadeFileName );
-    public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long matAddrInput, long matAddrResult);
+    public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
 
     public long cascadeClassifier_face = 0;
     public long cascadeClassifier_eye = 0;
@@ -140,14 +150,16 @@ public class FaceDetectionActivity extends AppCompatActivity
 
         buttonInit();
 
+        matResult = new Mat();
+
         // xml 파일 읽어와 객체 로드
         read_cascade_file();
 
         openCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
-        openCvCameraView.setCameraIndex(0); // front-camera(1), back-camera(0) 후면 카메라 사용
-        cameraType = 0;
+        openCvCameraView.setCameraIndex(1); // front-camera(1), back-camera(0) 후면 카메라 사용
+        cameraType = 1;
 
         //loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
@@ -184,19 +196,27 @@ public class FaceDetectionActivity extends AppCompatActivity
 
                     //Log.d(TAG, "capture : after getWriteLock()");
 
-                    File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
-                    path.mkdirs();
-                    File file = new File(path, "image.png");
-                    String filename = file.toString();
+                    fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
+
                     // TODO : error
                     // error : java.lang.NullPointerException: Attempt to read from field 'long org.opencv.core.Mat.nativeObj' on a null object reference
+                    // 근본적인 문제 : E/OpenCV/StaticHelper: OpenCV error: Cannot load info library for OpenCV --> 카메라 화면이 뜨지 않음
+                    // 버전이 안맞는건가?
                     Imgproc.cvtColor(matResult, matResult, Imgproc.COLOR_BGR2RGB, 4);
+
                     boolean ret = Imgcodecs.imwrite( filename, matResult);
-                    if ( ret ) Log.d(TAG, "SUCESS");
-                    else Log.d(TAG, "FAIL");
+
+                    if ( ret ) {
+                        Log.d(TAG, "take picture SUCCESS");
+                    }
+                    else {
+                        Log.d(TAG, "take picture FAIL");
+                    }
+
                     Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                     mediaScanIntent.setData(Uri.fromFile(file));
                     sendBroadcast(mediaScanIntent);
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -204,7 +224,59 @@ public class FaceDetectionActivity extends AppCompatActivity
             }
         });
     }
-    
+
+    private Uri getOutputMediaFileUri(int type){
+        // 아래 capture한 사진이 저장될 file 공간을 생성하는 method를 통해 반환되는 File의 URI를 반환
+
+        return FileProvider.getUriForFile(getApplicationContext(), "com.example.lglcamera.provider", getOutputMediaFile(type));
+        //return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+    private File getOutputMediaFile(int type){
+        // 외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
+        /*File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "LGL_Camera");*/
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory() + "/Images/");
+
+        // 폴더 없으면 생성
+        if (!mediaStorageDir.exists()){
+            // 예외처리
+            if (!mediaStorageDir.mkdirs()){ // 만약 mkdirs()가 제대로 동작하지 않을 경우, 오류 Log를 출력한 뒤, 해당 method 종료
+                Log.d(TAG, "폴더 생성 실패");
+                return null;
+            }
+        }
+
+        // 찍은 시간에 따른 파일 이름 설정
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+
+        if (type == MEDIA_TYPE_IMAGE){
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_"+ timeStamp + ".jpg");
+            filename = mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg";
+        } else {
+            return null;
+        }
+
+        file = mediaFile;
+        if(!file.exists()) {
+            try {
+                file.createNewFile();
+                Toast.makeText(getApplicationContext(), "successed to create " + filename, Toast.LENGTH_SHORT).show();
+
+            }
+            catch(IOException e) {
+                Toast.makeText(getApplicationContext(), "failed to create " + filename, Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            Toast.makeText(getApplicationContext(), filename + " is already exists", Toast.LENGTH_SHORT).show();
+        }
+
+        return mediaFile;
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -245,11 +317,11 @@ public class FaceDetectionActivity extends AppCompatActivity
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         try {
-            Log.d(TAG, "before getWriteLock()");
+            //Log.d(TAG, "before getWriteLock()");
 
             getWriteLock();
 
-            Log.d(TAG, "after getWriteLock()");
+            //Log.d(TAG, "after getWriteLock()");
 
             matInput = inputFrame.rgba();
 
@@ -260,22 +332,22 @@ public class FaceDetectionActivity extends AppCompatActivity
             // 영상 180도 회전
             Core.flip(matInput, matInput, 1);
 
-            Log.d(TAG, "after rotate screen / before detect()");
+            //Log.d(TAG, "after rotate screen / before detect()");
 
             detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
                     matResult.getNativeObjAddr());
 
-            Log.d(TAG, "after detect()");
+            //Log.d(TAG, "after detect()");
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "before releaseWriteLock()");
+        //Log.d(TAG, "before releaseWriteLock()");
 
         releaseWriteLock();
 
-        Log.d(TAG, "after releaseWriteLock()");
+        //Log.d(TAG, "after releaseWriteLock()");
 
         return matResult;
     }

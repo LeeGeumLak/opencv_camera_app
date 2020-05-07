@@ -5,6 +5,8 @@ import androidx.core.content.FileProvider;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
@@ -13,9 +15,12 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.OrientationEventListener;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -28,7 +33,11 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.Buffer;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -195,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_capture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
-
                 /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
@@ -219,14 +226,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     String filename = file.toString();*/
                     fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
-                    // TODO : error
-                    // error : java.lang.NullPointerException: Attempt to read from field 'long org.opencv.core.Mat.nativeObj' on a null object reference
-                    Imgproc.cvtColor(matResult, matResult, Imgproc.COLOR_BGR2RGB, 4);
-
-                    boolean ret = Imgcodecs.imwrite( filename, matResult);
+                    boolean ret = Imgcodecs.imwrite( filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
 
                     if ( ret ) {
-                        Log.d(TAG, "take pictureSUCCESS");
+                        Log.d(TAG, "take picture SUCCESS");
                     }
                     else {
                         Log.d(TAG, "take picture FAIL");
@@ -282,12 +285,25 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_"+ timeStamp + ".jpg");
-            filename = "IMG_"+ timeStamp + ".jpg";
+            filename = mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg";
         } else {
             return null;
         }
 
-        file = mediaStorageDir;
+        file = mediaFile;
+        if(!file.exists()) {
+            try {
+                file.createNewFile();
+                Toast.makeText(getApplicationContext(), "successed to create " + filename, Toast.LENGTH_SHORT).show();
+
+            }
+            catch(IOException e) {
+                Toast.makeText(getApplicationContext(), "failed to create " + filename, Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            Toast.makeText(getApplicationContext(), filename + " is already exists", Toast.LENGTH_SHORT).show();
+        }
 
         return mediaFile;
     }
@@ -355,7 +371,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         return matResult;
     }
-
 
     protected List<? extends CameraBridgeViewBase> getCameraViewList() {
         return Collections.singletonList(openCvCameraView);
