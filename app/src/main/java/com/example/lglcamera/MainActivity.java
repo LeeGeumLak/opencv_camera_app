@@ -12,6 +12,7 @@ import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -25,12 +26,13 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 
 import static android.Manifest.permission.CAMERA;
@@ -49,9 +52,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = "MainActivity";
 
-    // 메인 UI
     private Button Button_RGB, Button_Gray, Button_HSV, Button_text, Button_capture, Button_sticker;
-    private Button Button_option, Button_change, Button_filter;
+    private Button Button_option, Button_change, Button_filter, Button_gallery;
 
     private Mat matInput, matResult;
     private int GrayScale, RGBA, HSV, sticker;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private Uri fileUri;
     private File file;
+    private File mediaStorageDir; // 캡쳐한 이미지가 저장되는 디렉토리
     private String filename;
 
     // 버튼 클릭시, 애니메이션 이벤트
@@ -195,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_capture = findViewById(R.id.Button_capture);
         Button_change = findViewById(R.id.Button_change);
         Button_option = findViewById(R.id.Button_option);
+        Button_gallery = findViewById(R.id.Button_gallery);
 
         Button_filter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -237,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @Override
             public void onClick(View v) {
                 //TODO : 문자인식
-                Intent textify_intent = new Intent(MainActivity.this, TextifyActivity.class);
-                startActivity(textify_intent);
+                Intent textifyIntent = new Intent(MainActivity.this, TextifyActivity.class);
+                startActivity(textifyIntent);
             }
         });
 
@@ -249,9 +253,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 GrayScale = 0;
                 HSV  = 0;
                 sticker = 1;
+            }
+        });
 
-                /*Intent sticker_intent = new Intent(MainActivity.this, FaceDetectionActivity.class);
-                startActivity(sticker_intent);*/
+        Button_gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
+                Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
+                galleryIntent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
+                galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivity(galleryIntent);
             }
         });
 
@@ -355,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         // 외부 저장소에 이 앱을 통해 촬영된 사진만 저장할 directory 경로와 File을 연결
         /*File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "LGL_Camera");*/
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory() + "/Images/");
+        mediaStorageDir = new File(Environment.getExternalStorageDirectory() + "/Images/");
 
         // 폴더 없으면 생성
         if (!mediaStorageDir.exists()){
