@@ -206,15 +206,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                     getWriteLock();
 
-
-
-
                     //Log.d(TAG, "capture : after getWriteLock()");
-
                     /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
                     path.mkdirs();
                     File file = new File(path, "image.png");
                     String filename = file.toString();*/
+
                     fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
                     boolean ret = Imgcodecs.imwrite( filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
