@@ -206,6 +206,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                     getWriteLock();
 
+
+
+
                     //Log.d(TAG, "capture : after getWriteLock()");
 
                     /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
