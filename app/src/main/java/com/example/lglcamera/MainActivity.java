@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -42,8 +44,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = "MainActivity";
 
-    private Button Button_RGB, Button_Gray, Button_HSV, Button_Text, Button_capture, Button_sticker;
-    private Button Button_change, Button_filter;
+    private Button Button_RGB, Button_Gray, Button_HSV, Button_text, Button_capture, Button_sticker;
+    private Button Button_option, Button_change, Button_filter;
 
     private Mat matInput, matResult;
     private int GrayScale, RGBA, HSV;
@@ -53,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private Uri fileUri;
     private File file;
     private String filename;
+
+    // 버튼 클릭시, 애니메이션 이벤트
+    private Animation btnOpen, btnClose;
+    private boolean isBtnOpen = false;
 
     private CameraBridgeViewBase openCvCameraView;
 
@@ -91,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,16 +124,24 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     // 버튼 초기화 및 리스너 설정
     private void buttonInit() {
+        Button_filter = findViewById(R.id.Button_filter);
+
         Button_RGB = findViewById(R.id.Button_RGB);
         Button_Gray = findViewById(R.id.Button_Gray);
         Button_HSV = findViewById(R.id.Button_HSV);
-
-        Button_Text = findViewById(R.id.Button_Text);
+        Button_text = findViewById(R.id.Button_Text);
         Button_sticker = findViewById(R.id.Button_Sticker);
 
         Button_capture = findViewById(R.id.Button_capture);
         Button_change = findViewById(R.id.Button_change);
-        //Button_filter = findViewById(R.id.Button_filter);
+        Button_option = findViewById(R.id.Button_option);
+
+        Button_filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleFab();
+            }
+        });
 
         Button_RGB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-        Button_Text.setOnClickListener(new View.OnClickListener() {
+        Button_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO : 문자인식
@@ -234,6 +247,31 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
             }
         });
+
+        // fab 애니메이션
+        btnOpen = AnimationUtils.loadAnimation(this, R.anim.btn_open);
+        btnClose = AnimationUtils.loadAnimation(this, R.anim.btn_close);
+    }
+
+    // 필터 버튼 클릭시, 애니메이션 이벤트
+    private void toggleFab() {
+        if(isBtnOpen) {
+
+            Button_Gray.startAnimation(btnClose);
+            Button_RGB.startAnimation(btnClose);
+            Button_HSV.startAnimation(btnClose);
+            Button_text.startAnimation(btnClose);
+            Button_sticker.startAnimation(btnClose);
+            isBtnOpen = false;
+        }
+        else {
+            Button_Gray.startAnimation(btnOpen);
+            Button_RGB.startAnimation(btnOpen);
+            Button_HSV.startAnimation(btnOpen);
+            Button_text.startAnimation(btnOpen);
+            Button_sticker.startAnimation(btnOpen);
+            isBtnOpen = true;
+        }
     }
 
     // 전/후면 카메라 전환 메서드
