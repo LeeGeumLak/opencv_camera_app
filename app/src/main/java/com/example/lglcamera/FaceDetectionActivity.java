@@ -56,8 +56,8 @@ public class FaceDetectionActivity extends AppCompatActivity
     private String filename;
 
     // Native c++ 메서드
-    public native long loadCascade(String cascadeFileName );
-    public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    /*public native long loadCascade(String cascadeFileName );
+    public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);*/
 
     public long cascadeClassifier_face = 0;
     public long cascadeClassifier_eye = 0;
@@ -115,10 +115,10 @@ public class FaceDetectionActivity extends AppCompatActivity
         Log.d(TAG, "read_cascade_file:");
 
         // 외부 저장소에서 파일 읽어와 객체 로드
-        cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
+        //cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
 
-        cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
+        //cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
     }
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
@@ -155,7 +155,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         // xml 파일 읽어와 객체 로드
         read_cascade_file();
 
-        openCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
+        //openCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
         openCvCameraView.setCameraIndex(1); // front-camera(1), back-camera(0) 후면 카메라 사용
@@ -336,8 +336,7 @@ public class FaceDetectionActivity extends AppCompatActivity
 
             //Log.d(TAG, "after rotate screen / before detect()");
 
-            detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
-                    matResult.getNativeObjAddr());
+            //detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
 
             //Log.d(TAG, "after detect()");
 

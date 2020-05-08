@@ -5,6 +5,7 @@ import androidx.core.content.FileProvider;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
@@ -24,11 +25,15 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -44,11 +49,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = "MainActivity";
 
+    // 메인 UI
     private Button Button_RGB, Button_Gray, Button_HSV, Button_text, Button_capture, Button_sticker;
     private Button Button_option, Button_change, Button_filter;
 
     private Mat matInput, matResult;
-    private int GrayScale, RGBA, HSV;
+    private int GrayScale, RGBA, HSV, sticker;
 
     private int cameraId = 0;
 
@@ -65,6 +71,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // Native c++ 메서드
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
+    public native long loadCascade(String cascadeFileName );
+    public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+
+    public long cascadeClassifier_face = 0;
+    public long cascadeClassifier_eye = 0;
 
     private final Semaphore writeLock = new Semaphore(1);
 
@@ -78,6 +89,52 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     static {
         System.loadLibrary("opencv_java4");
         System.loadLibrary("native-lib");
+    }
+
+    private void read_cascade_file(){
+        // Assets에서 파일 가져와 복사
+        copyFile("haarcascade_frontalface_alt.xml");
+        copyFile("haarcascade_eye_tree_eyeglasses.xml");
+
+        Log.d(TAG, "read_cascade_file:");
+
+        // 외부 저장소에서 파일 읽어와 객체 로드
+        cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
+        Log.d(TAG, "read_cascade_file:");
+
+        cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
+    }
+
+    private void copyFile(String filename) {
+        String baseDir = Environment.getExternalStorageDirectory().getPath();
+        String pathDir = baseDir + File.separator + filename;
+
+        AssetManager assetManager = this.getAssets();
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+
+        try {
+            Log.d( TAG, "copyFile : 다음 경로로 파일복사 "+ pathDir);
+            inputStream = assetManager.open(filename);
+            outputStream = new FileOutputStream(pathDir);
+
+            byte[] buffer = new byte[1024];
+            int read;
+
+            while ((read = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, read);
+            }
+
+            inputStream.close();
+            inputStream = null;
+            outputStream.flush();
+            outputStream.close();
+            outputStream = null;
+
+        } catch (Exception e) {
+            Log.d(TAG, "copyFile : 파일 복사 중 예외 발생 "+e.toString() );
+        }
     }
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
@@ -139,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleFab();
+                toggleBtn();
             }
         });
 
@@ -149,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 RGBA = 1;
                 GrayScale = 0;
                 HSV  = 0;
+                sticker = 0;
             }
         });
 
@@ -158,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 RGBA = 0;
                 GrayScale = 0;
                 HSV  = 1;
+                sticker = 0;
             }
         });
 
@@ -167,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 RGBA = 0;
                 GrayScale = 1;
                 HSV  = 0;
+                sticker = 0;
             }
         });
 
@@ -182,9 +242,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_sticker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO : 얼굴 인식
-                Intent sticker_intent = new Intent(MainActivity.this, FaceDetectionActivity.class);
-                startActivity(sticker_intent);
+                RGBA = 0;
+                GrayScale = 0;
+                HSV  = 0;
+                sticker = 1;
+
+                /*Intent sticker_intent = new Intent(MainActivity.this, FaceDetectionActivity.class);
+                startActivity(sticker_intent);*/
             }
         });
 
@@ -194,12 +258,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 swapCamera();
             }
         });
-
-        /*Button_filter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });*/
 
         // 카메라 찍기 버튼 리스너
         Button_capture.setOnClickListener(new View.OnClickListener() {
@@ -248,13 +306,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-        // fab 애니메이션
+        // 버튼 슬라이드 인/아웃 애니메이션
         btnOpen = AnimationUtils.loadAnimation(this, R.anim.btn_open);
         btnClose = AnimationUtils.loadAnimation(this, R.anim.btn_close);
     }
 
     // 필터 버튼 클릭시, 애니메이션 이벤트
-    private void toggleFab() {
+    private void toggleBtn() {
         if(isBtnOpen) {
             Button_filter.setBackgroundResource(R.drawable.filter_change);
             Button_Gray.startAnimation(btnClose);
@@ -394,6 +452,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
         if(HSV == 1) {
             ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+        }
+        if(sticker == 1) {
+            // 영상 180도 회전
+            Core.flip(matInput, matInput, 1);
+
+            detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
+                    matResult.getNativeObjAddr());
         }
 
         return matResult;
