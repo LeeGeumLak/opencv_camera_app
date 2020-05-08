@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // 필터 버튼 클릭시, 애니메이션 이벤트
     private void toggleFab() {
         if(isBtnOpen) {
-
+            Button_filter.setBackgroundResource(R.drawable.filter_change);
             Button_Gray.startAnimation(btnClose);
             Button_RGB.startAnimation(btnClose);
             Button_HSV.startAnimation(btnClose);
@@ -265,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             isBtnOpen = false;
         }
         else {
+            Button_filter.setBackgroundResource(R.drawable.filter_pressed);
             Button_Gray.startAnimation(btnOpen);
             Button_RGB.startAnimation(btnOpen);
             Button_HSV.startAnimation(btnOpen);
