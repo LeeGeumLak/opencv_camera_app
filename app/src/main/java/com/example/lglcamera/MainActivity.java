@@ -171,6 +171,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         buttonInit();
 
+        // xml 파일 읽어와 객체 로드
+        read_cascade_file();
+
         // 권한 설정 후, 카메라 실행
         openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -454,9 +457,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }
         if(sticker == 1) {
-            // 영상 180도 회전
-            Core.flip(matInput, matInput, 1);
-
             detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
                     matResult.getNativeObjAddr());
         }
