@@ -35,7 +35,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FaceTalkActivity"></activity>
+        <activity android:name=".GoToGalleryActivity"></activity>
         <activity
             android:name=".FaceDetectionActivity"
             android:screenOrientation="landscape"

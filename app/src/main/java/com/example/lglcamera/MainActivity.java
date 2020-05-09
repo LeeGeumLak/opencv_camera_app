@@ -3,7 +3,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -13,7 +12,6 @@ import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -31,9 +29,7 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,7 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Semaphore;
 
 import static android.Manifest.permission.CAMERA;
@@ -275,8 +270,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @Override
             public void onClick(View v) {
                 //TODO : webRTC 적용후, 인텐트로 이동하는 이벤트 추가
-                Intent faceTalkIntent = new Intent(MainActivity.this, FaceTalkActivity.class);
-                startActivity(faceTalkIntent);
+
             }
         });
 
@@ -288,9 +282,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 //galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivity(galleryIntent);*/
                 //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
-
-
-
+                Intent galleryIntent = new Intent(MainActivity.this, GoToGalleryActivity.class);
+                startActivity(galleryIntent);
             }
         });
 
