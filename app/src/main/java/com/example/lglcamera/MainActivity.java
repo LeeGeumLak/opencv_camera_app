@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private static final String TAG = "MainActivity";
 
     private Button Button_RGB, Button_Gray, Button_HSV, Button_text, Button_capture, Button_sticker;
-    private Button Button_option, Button_change, Button_filter, Button_gallery;
+    private Button Button_webRtc, Button_change, Button_filter, Button_gallery;
 
     private Mat matInput, matResult;
     private int GrayScale, RGBA, HSV, sticker;
@@ -71,6 +71,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private boolean isBtnOpen = false;
 
     private CameraBridgeViewBase openCvCameraView;
+
+    // back 버튼 종료 이벤트 설정
+    private final long FINISH_INTERVAL_TIME = 2000;
+    private long   backPressedTime = 0;
 
     // Native c++ 메서드
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
@@ -198,9 +202,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         Button_capture = findViewById(R.id.Button_capture);
         Button_change = findViewById(R.id.Button_change);
-        Button_option = findViewById(R.id.Button_option);
         Button_gallery = findViewById(R.id.Button_gallery);
+        Button_webRtc = findViewById(R.id.Button_webRtc);
 
+        // 카메라 필터 관련 버튼
         Button_filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -257,24 +262,34 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-        Button_gallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
-                galleryIntent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
-                //galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivity(galleryIntent);*/
-                //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
 
-
-
-            }
-        });
-
+        // 필터 외의 카메라 기능 버튼
         Button_change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 swapCamera();
+            }
+        });
+
+        Button_webRtc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO : webRTC 적용후, 인텐트로 이동하는 이벤트 추가
+
+            }
+        });
+
+        Button_gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
+                galleryIntent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
+                //galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivity(galleryIntent);
+                //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
+
+
+
             }
         });
 
@@ -410,6 +425,21 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
 
         return mediaFile;
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        long tempTime = System.currentTimeMillis();
+        long intervalTime = tempTime - backPressedTime;
+
+        if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime) {
+            super.onBackPressed();
+            finish();
+        } else {
+            backPressedTime = tempTime;
+            Toast.makeText(getApplicationContext(), "뒤로가기 버튼을 한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

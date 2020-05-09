@@ -121,7 +121,7 @@
         android:background="@drawable/camera_ok" />
 
     <Button
-        android:id="@+id/Button_option"
+        android:id="@+id/Button_webRtc"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentStart="true"
@@ -133,7 +133,7 @@
         android:layout_marginEnd="364dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="344dp"
-        android:background="@drawable/option" />
+        android:background="@drawable/video_camera" />
 
     <Button
         android:id="@+id/Button_change"

@@ -82,5 +82,4 @@ dependencies {
 
     // WebRTC api
     implementation 'org.webrtc:google-webrtc:1.0.+'
-    implementation files('libs/autobanh.jar')
 }
