@@ -55,6 +55,12 @@ android {
     }
 
     ndkVersion "20.0.5594570"
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
 }
 
 dependencies {
@@ -67,11 +73,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation project(path: ':opencv')
 
-
     // airbnb lottie api
     implementation 'com.airbnb.android:lottie:3.4.0'
 
-    // tesseract
+    // tesseract api
     implementation 'com.rmtheis:tess-two:9.1.0'
     implementation 'com.google.android.material:material:1.1.0'
+
+    // WebRTC api
+    implementation 'org.webrtc:google-webrtc:1.0.+'
 }

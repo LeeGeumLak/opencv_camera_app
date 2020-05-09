@@ -130,7 +130,7 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="9dp"
         android:layout_marginTop="9dp"
-        android:layout_marginEnd="374dp"
+        android:layout_marginEnd="364dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="344dp"
         android:background="@drawable/option" />

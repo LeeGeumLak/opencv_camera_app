@@ -3,6 +3,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -259,11 +260,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
-                Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
+                /*Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
                 galleryIntent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
-                galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivity(galleryIntent);
+                //galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivity(galleryIntent);*/
+                //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
+
+
+
             }
         });
 
