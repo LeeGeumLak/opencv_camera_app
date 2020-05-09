@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 //galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivity(galleryIntent);
                 //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
-
+                
 
 
             }
