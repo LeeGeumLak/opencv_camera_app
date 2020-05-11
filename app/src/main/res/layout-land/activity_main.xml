@@ -20,72 +20,40 @@
         android:id="@+id/Button_Sticker"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_below="@+id/Button_Text"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="570dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
-        android:background="#7d010000"
-        android:text="Sticker"
-        android:textColor="#ffffff"
-        android:textSize="13dp" />
-
-    <Button
-        android:id="@+id/Button_HSV"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_marginStart="570dp"
         android:layout_marginTop="29dp"
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
-        android:background="#7d010000 "
-        android:text="HSV"
-        android:textColor="#ffffff"
-        android:textSize="13dp" />
-
-    <Button
-        android:id="@+id/Button_Gray"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_below="@+id/Button_HSV"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="570dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
         android:background="#7d010000"
-        android:text="Gray"
+        android:text="Sticker"
         android:textColor="#ffffff"
-        android:textSize="13dp" />
+        android:textSize="13dp"
+        android:visibility="invisible"/>
 
     <Button
-        android:id="@+id/Button_RGB"
+        android:id="@+id/Button_HSV"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_below="@+id/Button_Gray"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginStart="570dp"
-        android:layout_marginTop="9dp"
+        android:layout_marginStart="566dp"
+        android:layout_marginTop="310dp"
         android:layout_marginEnd="100dp"
-        android:layout_marginRight="100dp"
-        android:background="#7d010000"
-        android:text="RGB"
+        android:layout_marginRight="104dp"
+        android:background="#7d010000 "
+        android:text="HSV"
         android:textColor="#ffffff"
-        android:textSize="13dp" />
+        android:textSize="13dp"
+        android:visibility="invisible"/>
 
     <Button
-        android:id="@+id/Button_Text"
+        android:id="@+id/Button_Gray"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_below="@+id/Button_RGB"
@@ -97,9 +65,46 @@
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
         android:background="#7d010000"
+        android:text="Gray"
+        android:textColor="#ffffff"
+        android:textSize="13dp"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/Button_RGB"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_Text"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="570dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="100dp"
+        android:background="#7d010000"
+        android:text="RGB"
+        android:textColor="#ffffff"
+        android:textSize="13dp"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/Button_Text"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_Sticker"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="570dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="100dp"
+        android:background="#7d010000"
         android:text="Text"
         android:textColor="#ffffff"
-        android:textSize="13dp" />
+        android:textSize="13dp"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/Button_capture"
