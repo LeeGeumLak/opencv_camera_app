@@ -17,7 +17,7 @@ Java_com_example_lglcamera_MainActivity_stringFromJNI(
 }*/
 
 // image resize
-float resize(Mat img_src, Mat &img_resize, int resize_width){
+float imgResize(Mat img_src, Mat &img_resize, int resize_width){
     float scale = resize_width / (float)img_src.cols ;
     if (img_src.cols > resize_width) {
         int new_height = cvRound(img_src.rows * scale);
@@ -78,24 +78,17 @@ float resize(Mat img_src, Mat &img_resize, int resize_width){
     }
 }*/
 
-void detectAndDraw( Mat& img, CascadeClassifier& cascade,
-                    CascadeClassifier& nestedCascade,
-                    double scale, bool tryflip, Mat glasses );
-void overlayImage(const Mat &background, const Mat &foreground,
-                  Mat &output, Point2i location);
+void detectAndDraw( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
+void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location);
 
-void detectAndDraw( Mat& img, CascadeClassifier& cascade,
-                    CascadeClassifier& nestedCascade,
-                    double scale, bool tryflip, Mat glasses )
-{
+void detectAndDraw( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses ) {
 
     Mat output2;
     img.copyTo(output2);
 
     double t = 0;
     vector<Rect> faces, faces2;
-    const static Scalar colors[] =
-            {
+    const static Scalar colors[] = {
                     Scalar(255,0,0),
                     Scalar(255,128,0),
                     Scalar(255,255,0),
@@ -216,12 +209,6 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
             }
         }
     }
-
-    if ( result.empty() )
-        imshow( "result", img );
-    else
-        imshow( "result", result );
-
 }
 
 
@@ -384,11 +371,14 @@ JNIEXPORT void JNICALL
 Java_com_example_lglcamera_MainActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
                                                          jlong cascadeClassifier_eye, jlong mat_addr_Input, jlong mat_addr_Result) {
 
-    /*//__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
 
     Mat &img_input = *(Mat *) mat_addr_Input;
     Mat &img_result = *(Mat *) mat_addr_Result;
     img_result = img_input.clone();
+
+    Mat output2;
+    img_result.copyTo(output2);
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 2);
 
@@ -400,14 +390,14 @@ Java_com_example_lglcamera_MainActivity_DetectAndDraw (JNIEnv *env, jobject type
     cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
     equalizeHist(img_gray, img_gray);
     Mat img_resize;
-    float resizeRatio = resize(img_gray, img_resize, 640);
+    float resizeRatio = imgResize(img_gray, img_resize, 640);
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 4);
 
     //-- Detect faces
     ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces, 1.1, 2, 0|CASCADE_SCALE_IMAGE, Size(30, 30) );
 
-    __android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ", (char *) "face %d found ", faces.size());
+    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ", (char *) "face %d found ", faces.size());
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 5);
 
@@ -428,18 +418,35 @@ Java_com_example_lglcamera_MainActivity_DetectAndDraw (JNIEnv *env, jobject type
         vector<Rect> eyes;
 
         //-- In each face, detect eyes
-        ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CASCADE_SCALE_IMAGE, Size(30, 30) );
+        ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CASCADE_SCALE_IMAGE, Size(20, 20) );
         for ( size_t j = 0; j < eyes.size(); j++ ) {
-            *//*Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
+            Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
 
             int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
-            circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );*//*
+            circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
+            /*Mat &img_input = *(Mat *) mat_addr_Input;
+            Mat &img_result = *(Mat *) mat_addr_Result;
+
+            img_result = img_input;
+
+            String glassesImage = "sunglasses.png";
+            bool tryflip = false;
+            double scale;
+            scale = 1;
+
+            Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
+
+            CascadeClassifier cascade, nestedCascade;
+            cascade = *(CascadeClassifier *)cascadeClassifier_face;
+            nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
+
+            detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
         }
     }
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);*/
 
-    Mat &img_input = *(Mat *) mat_addr_Input;
+    /*Mat &img_input = *(Mat *) mat_addr_Input;
     Mat &img_result = *(Mat *) mat_addr_Result;
 
     img_result = img_input;
@@ -455,7 +462,7 @@ Java_com_example_lglcamera_MainActivity_DetectAndDraw (JNIEnv *env, jobject type
     cascade = *(CascadeClassifier *)cascadeClassifier_face;
     nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
 
-    detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);
+    detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
 }
 
 // rgb -> gray
