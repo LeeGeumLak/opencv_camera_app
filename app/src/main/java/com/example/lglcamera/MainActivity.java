@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // Native c++ 메서드
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
-    public native long loadCascade(String cascadeFileName );
-    public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    public native long LoadCascade(String cascadeFileName );
+    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
 
     public long cascadeClassifier_face = 0;
     public long cascadeClassifier_eye = 0;
@@ -102,10 +102,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Log.d(TAG, "read_cascade_file:");
 
         // 외부 저장소에서 파일 읽어와 객체 로드
-        cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
+        cascadeClassifier_face = LoadCascade( "haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
 
-        cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
+        cascadeClassifier_eye = LoadCascade( "haarcascade_eye_tree_eyeglasses.xml");
     }
 
     private void copyFile(String filename) {
@@ -497,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }
         if(sticker == 1) {
-            detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
+            DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
                     matResult.getNativeObjAddr());
         }
 
