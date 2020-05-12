@@ -272,8 +272,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @Override
             public void onClick(View v) {
                 //TODO : webRTC 적용후, 인텐트로 이동하는 이벤트 추가
-                Intent faceTalkIntent = new Intent(MainActivity.this, FaceTalkActivity.class);
-                startActivity(faceTalkIntent);
+                //Intent faceTalkIntent = new Intent(MainActivity.this, FaceTalkActivity.class);
+                //startActivity(faceTalkIntent);
             }
         });
 

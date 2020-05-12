@@ -14,10 +14,4 @@
 
     </style>
 
-    <style name="rtcActivityTheme" parent="android:Theme.Black">
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowNoTitle">true</item>
-    </style>
-
 </resources>
