@@ -53,17 +53,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".IncomingCallActivity"
+            android:label="@string/title_activity_incoming_call">
+        </activity>
+        <activity
             android:name=".FaceTalkActivity"
             android:label="@string/title_activity_video_chat"
             android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="stateHidden"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-
         <activity android:name=".GoToGalleryActivity" />
         <activity
             android:name=".FaceDetectionActivity"
@@ -86,14 +88,6 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation">
-
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
         </activity> <!-- 사진 촬영을 위한 provide -->
         <provider
             android:name="androidx.core.content.FileProvider"
