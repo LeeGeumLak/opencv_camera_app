@@ -79,15 +79,15 @@ public class LoginActivity extends Activity {
 
     /**
      * Optional function to specify what a username in your chat app can look like.
-     * @param username The name entered by a user.
+     * @param username_str The name entered by a user.
      * @return is username valid
      */
-    private boolean validUsername(String username) {
-        if (username.length() == 0) {
+    private boolean validUsername(String username_str) {
+        if (username_str.length() == 0) {
             username.setError("Username cannot be empty.");
             return false;
         }
-        if (username.length() > 16) {
+        if (username_str.length() > 16) {
             username.setError("Username too long.");
             return false;
         }
