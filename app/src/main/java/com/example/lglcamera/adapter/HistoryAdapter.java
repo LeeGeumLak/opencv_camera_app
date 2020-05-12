@@ -10,6 +10,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.lglcamera.R;
+import com.example.lglcamera.activity.FaceTalkActivity;
+import com.example.lglcamera.data.ChatUser;
+import com.example.lglcamera.data.HistoryItem;
+import com.example.lglcamera.utils.Constants;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 
@@ -24,12 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import me.kevingleason.androidrtc.MainActivity;
-import me.kevingleason.androidrtc.R;
-import me.kevingleason.androidrtc.adt.ChatUser;
-import me.kevingleason.androidrtc.adt.HistoryItem;
-import me.kevingleason.androidrtc.util.Constants;
 
 /**
  * Created by GleasonK on 7/31/15.
@@ -83,7 +82,7 @@ public class HistoryAdapter extends ArrayAdapter<HistoryItem> {
         holder.callBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)context).dispatchCall(hItem.getUser().getUserId());
+                ((FaceTalkActivity)context).dispatchCall(hItem.getUser().getUserId());
             }
         });
         holder.histItem=hItem;
