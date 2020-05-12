@@ -1,10 +1,13 @@
-package com.example.lglcamera;
+package com.example.lglcamera.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.os.Environment;
+
+import com.example.lglcamera.R;
+import com.example.lglcamera.adapter.VpGalleryAdapter;
 
 public class GoToGalleryActivity extends AppCompatActivity {
     @Override

@@ -1,4 +1,4 @@
-package com.example.lglcamera;
+package com.example.lglcamera.activity;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -21,13 +21,14 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.lglcamera.R;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.objdetect.CascadeClassifier;
 
 import java.io.File;
 import java.io.FileOutputStream;

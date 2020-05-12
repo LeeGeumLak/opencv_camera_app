@@ -1,6 +1,4 @@
-package com.example.lglcamera;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.lglcamera.activity;
 
 import android.animation.Animator;
 import android.app.Activity;
@@ -9,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.lglcamera.R;
 
 public class LoadingActivity extends Activity {
     @Override

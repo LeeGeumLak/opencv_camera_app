@@ -345,7 +345,7 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
 }*/
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_example_lglcamera_MainActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
+Java_com_example_lglcamera_activity_MainActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
     const char *nativeFileNameString = env->GetStringUTFChars(cascadeFileName_, 0);
     string baseDir("/storage/emulated/0/");
     baseDir.append(nativeFileNameString);
@@ -368,7 +368,7 @@ Java_com_example_lglcamera_MainActivity_LoadCascade(JNIEnv *env, jobject type, j
 // face detect and circle
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_MainActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
+Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
                                                          jlong cascadeClassifier_eye, jlong mat_addr_Input, jlong mat_addr_Result) {
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
@@ -468,7 +468,7 @@ Java_com_example_lglcamera_MainActivity_DetectAndDraw (JNIEnv *env, jobject type
 // rgb -> gray
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_MainActivity_ConvertRGBtoGray(JNIEnv *env, jobject thiz,
+Java_com_example_lglcamera_activity_MainActivity_ConvertRGBtoGray(JNIEnv *env, jobject thiz,
                                                          jlong mat_addr_input,
                                                          jlong mat_addr_result) {
     // TODO: implement ConvertRGBtoGray()
@@ -481,7 +481,7 @@ Java_com_example_lglcamera_MainActivity_ConvertRGBtoGray(JNIEnv *env, jobject th
 // rgb -> hsv
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_MainActivity_ConvertRGBtoHSV(JNIEnv *env, jobject thiz,
+Java_com_example_lglcamera_activity_MainActivity_ConvertRGBtoHSV(JNIEnv *env, jobject thiz,
                                                          jlong mat_addr_input,
                                                          jlong mat_addr_result) {
     // TODO: implement ConvertRGBtoGray()

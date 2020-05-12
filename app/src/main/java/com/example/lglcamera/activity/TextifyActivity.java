@@ -1,4 +1,4 @@
-package com.example.lglcamera;
+package com.example.lglcamera.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.res.AssetManager;
@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.lglcamera.data.CameraSurfaceView;
+import com.example.lglcamera.R;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;

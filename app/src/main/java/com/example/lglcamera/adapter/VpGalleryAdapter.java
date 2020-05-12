@@ -1,4 +1,4 @@
-package com.example.lglcamera;
+package com.example.lglcamera.adapter;
 
 import java.io.File;
 
@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.viewpager.widget.PagerAdapter;
+
+import com.example.lglcamera.R;
+import com.example.lglcamera.data.ImageFileFilter;
 
 public class VpGalleryAdapter extends PagerAdapter {
 

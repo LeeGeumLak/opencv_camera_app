@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity"
+    tools:context=".activity.MainActivity"
     tools:ignore="MissingDefaultResource">
 
     <FrameLayout
@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_weight="0.3">
 
-        <com.example.lglcamera.CameraSurfaceView
+        <com.example.lglcamera.data.CameraSurfaceView
             android:id="@+id/surfaceView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

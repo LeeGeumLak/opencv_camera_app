@@ -53,30 +53,30 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".IncomingCallActivity"
+            android:name=".activity.IncomingCallActivity"
             android:label="@string/title_activity_incoming_call">
         </activity>
         <activity
-            android:name=".FaceTalkActivity"
+            android:name=".activity.FaceTalkActivity"
             android:label="@string/title_activity_video_chat"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
-        <activity android:name=".GoToGalleryActivity" />
+        <activity android:name=".activity.GoToGalleryActivity" />
         <activity
-            android:name=".FaceDetectionActivity"
+            android:name=".activity.FaceDetectionActivity"
             android:screenOrientation="landscape"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".TextifyActivity"
+            android:name=".activity.TextifyActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".LoadingActivity"
+            android:name=".activity.LoadingActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
@@ -86,7 +86,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:configChanges="keyboardHidden|orientation">
         </activity> <!-- 사진 촬영을 위한 provide -->
         <provider

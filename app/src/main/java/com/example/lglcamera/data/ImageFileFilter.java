@@ -1,4 +1,4 @@
-package com.example.lglcamera;
+package com.example.lglcamera.data;
 
 import java.io.File;
 import java.io.FilenameFilter;

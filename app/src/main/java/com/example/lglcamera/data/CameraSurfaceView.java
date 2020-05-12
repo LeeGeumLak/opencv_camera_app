@@ -1,4 +1,4 @@
-package com.example.lglcamera;
+package com.example.lglcamera.data;
 
 import android.content.Context;
 import android.content.res.Configuration;

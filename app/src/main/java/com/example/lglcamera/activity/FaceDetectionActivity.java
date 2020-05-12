@@ -1,4 +1,4 @@
-package com.example.lglcamera;
+package com.example.lglcamera.activity;
 
 //기본 패키지
 import android.content.Intent;
@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 //openCV 패키지
+import com.example.lglcamera.R;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
