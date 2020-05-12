@@ -4,7 +4,13 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
 
-    <color name="white">#FFFFFF</color>
+    <color name="pn_red">#d02129</color>
+    <color name="pn_blue">#ff19a2c6</color>
+    <color name="pn_blue_dark">#ff187998</color>
+    <color name="white">#FFF</color>
+    <color name="green">#ff1ce322</color>
+    <color name="grey">#eee</color>
+
     <color name="ivory">#FFFFF0</color>
     <color name="light_yellow">#FFFFE0</color>
     <color name="yellow">#FFFF00</color>
@@ -137,7 +143,6 @@
     <color name="deep_sky_blue">#00BFFF</color>
     <color name="dark_cyan">#008B8B</color>
     <color name="teal">#008080</color>
-    <color name="green">#008000</color>
     <color name="dark_green">#006400</color>
     <color name="blue">#0000FF</color>
     <color name="medium_blue">#0000CD</color>
