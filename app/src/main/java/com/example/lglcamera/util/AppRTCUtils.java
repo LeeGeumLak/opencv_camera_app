@@ -16,7 +16,8 @@ import android.util.Log;
 /**
  * AppRTCUtils provides helper functions for managing thread safety.
  */
-public final class AppRTCUtils {
+// public final class AppRTCUtils {
+public class AppRTCUtils {
     private AppRTCUtils() {
     }
 
