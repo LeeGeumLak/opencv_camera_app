@@ -267,11 +267,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
+        // 화상채팅을 위한 WebRTC 인텐트로 이동
         Button_webRtc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO : webRTC 적용후, 인텐트로 이동하는 이벤트 추가
-                //Intent faceTalkIntent = new Intent(MainActivity.this, FaceTalkActivity.class);
+                //Intent faceTalkIntent = new Intent(MainActivity.this, ConnectActivity.class);
                 //startActivity(faceTalkIntent);
             }
         });
@@ -279,11 +280,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 기존 갤러리로 이동하는 intent
                 /*Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
                 galleryIntent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
                 //galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivity(galleryIntent);*/
-                //TODO : pager adapter 사용해서 커스텀 갤러리 해보기 (현재 : 기존 갤러리로 이동하는 인텐트)
+
+                //pager adapter 사용한 커스텀 갤러리로 이동하는 intent
+                //TODO : 현재 이미지를 볼 수 있으나, 목록 형태가 아닌 이미지 뷰어 형태(무슨 파일들이 있는지 한번에 볼 수 없음)
                 Intent galleryIntent = new Intent(MainActivity.this, GoToGalleryActivity.class);
                 startActivity(galleryIntent);
             }
