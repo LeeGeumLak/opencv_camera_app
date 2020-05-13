@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.lglcamera">
+
     <!-- camera permission -->
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -21,7 +22,9 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" /> <!-- storage permission -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- storage permission -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -42,17 +45,46 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="HardcodedDebugMode">
-        <activity android:name=".ConnectActivity"></activity>
-        <activity android:name=".CallActivity" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings_name">
+        </activity>
+
+        <activity
+            android:name=".ConnectActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="appr.tc"/>
+                <data android:scheme="http" android:host="appr.tc"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".CallActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="fullUser"
+            android:configChanges="orientation|smallestScreenSize|screenSize|screenLayout"
+            android:theme="@style/CallActivityTheme">
+        </activity>
+
         <activity android:name=".activity.GoToGalleryActivity" />
+
         <activity
             android:name=".activity.FaceDetectionActivity"
             android:screenOrientation="landscape"
             tools:ignore="LockedOrientationActivity" />
+
         <activity
             android:name=".activity.TextifyActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
         <activity
             android:name=".activity.LoadingActivity"
             android:screenOrientation="portrait"
@@ -63,9 +95,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.MainActivity"
-            android:configChanges="keyboardHidden|orientation" /> <!-- 사진 촬영을 위한 provide -->
+            android:configChanges="keyboardHidden|orientation" />
+
+        <!-- 사진 촬영을 위한 provide -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.lglcamera.provider"
