@@ -11,19 +11,19 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
 
-        <!--   WebRTC theme    -->
-        <style name="AppRTCMobileActivityTheme" parent="android:Theme.Material">
-            <item name="android:windowActionBar">false</item>
-            <item name="android:windowFullscreen">true</item>
-            <item name="android:windowNoTitle">true</item>
-        </style>
+    </style>
 
-        <style name="CallActivityTheme" parent="android:Theme.Black">
-            <item name="android:windowActionBar">false</item>
-            <item name="android:windowFullscreen">true</item>
-            <item name="android:windowNoTitle">true</item>
-        </style>
+    <!--   WebRTC theme    -->
+    <style name="AppRTCMobileActivityTheme" parent="android:Theme.Material">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
+    <style name="CallActivityTheme" parent="android:Theme.Black">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 
 </resources>
