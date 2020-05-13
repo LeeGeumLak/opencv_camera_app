@@ -16,7 +16,6 @@ Java_com_example_lglcamera_MainActivity_stringFromJNI(
     return env->NewStringUTF(hello.c_str());
 }*/
 
-// image resize
 float imgResize(Mat img_src, Mat &img_resize, int resize_width){
     float scale = resize_width / (float)img_src.cols ;
     if (img_src.cols > resize_width) {

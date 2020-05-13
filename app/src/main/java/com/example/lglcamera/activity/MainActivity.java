@@ -259,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-
         // 필터 외의 카메라 기능 버튼
         Button_change.setOnClickListener(new View.OnClickListener() {
             @Override
