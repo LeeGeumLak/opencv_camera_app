@@ -69,7 +69,7 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
             System.loadLibrary("boringssl.cr");
             System.loadLibrary("protobuf_lite.cr");
         } catch (UnsatisfiedLinkError e) {
-            Logging.w(TAG, "Failed to load native dependencies: ", e);
+            Log.e(TAG, "Failed to load native dependencies: ");
         }
     }
 
