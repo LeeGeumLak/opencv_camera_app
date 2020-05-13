@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.lglcamera"
-        minSdkVersion 26
+        minSdkVersion 18
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -42,7 +42,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -66,10 +66,13 @@ android {
         sourceCompatibility 1.8
     }
 
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.so'])
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
@@ -88,4 +91,9 @@ dependencies {
     // tesseract api
     implementation 'com.rmtheis:tess-two:9.1.0'
     implementation 'com.google.android.material:material:1.1.0'
+
+    compile files('libs/audio_device_java__compile_java.javac.jar')
+    compile files('libs/autobanh.jar')
+    compile files('libs/base_java.jar')
+    compile files('libs/libjingle_peerconnection_java.jar')
 }

@@ -1,3 +1,13 @@
+/*
+ *  Copyright 2015 The WebRTC Project Authors. All rights reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree. An additional intellectual property rights grant can be found
+ *  in the file PATENTS.  All contributing project authors may
+ *  be found in the AUTHORS file in the root of the source tree.
+ */
+
 package com.example.lglcamera;
 
 import android.annotation.TargetApi;
@@ -34,6 +44,7 @@ import com.example.lglcamera.AppRTCClient.RoomConnectionParameters;
 import com.example.lglcamera.AppRTCClient.SignalingParameters;
 import com.example.lglcamera.PeerConnectionClient.DataChannelParameters;
 import com.example.lglcamera.PeerConnectionClient.PeerConnectionParameters;
+
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraEnumerator;
@@ -69,58 +80,59 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
             System.loadLibrary("boringssl.cr");
             System.loadLibrary("protobuf_lite.cr");
         } catch (UnsatisfiedLinkError e) {
-            Logging.w(TAG, "Failed to load native dependencies: ", e);
+            Log.e(TAG, "Failed to load native dependencies: ");
+            //Logging.w(TAG, "Failed to load native dependencies: ", e);
         }
     }
 
-    public static final String EXTRA_ROOMID = "com.example.lglcamera.ROOMID";
-    public static final String EXTRA_URLPARAMETERS = "com.example.lglcamera.URLPARAMETERS";
-    public static final String EXTRA_LOOPBACK = "com.example.lglcamera.LOOPBACK";
-    public static final String EXTRA_VIDEO_CALL = "com.example.lglcamera.VIDEO_CALL";
-    public static final String EXTRA_SCREENCAPTURE = "com.example.lglcamera.SCREENCAPTURE";
-    public static final String EXTRA_CAMERA2 = "com.example.lglcamera.CAMERA2";
-    public static final String EXTRA_VIDEO_WIDTH = "com.example.lglcamera.VIDEO_WIDTH";
-    public static final String EXTRA_VIDEO_HEIGHT = "com.example.lglcamera.VIDEO_HEIGHT";
-    public static final String EXTRA_VIDEO_FPS = "com.example.lglcamera.VIDEO_FPS";
+    public static final String EXTRA_ROOMID = "org.appspot.apprtc.ROOMID";
+    public static final String EXTRA_URLPARAMETERS = "org.appspot.apprtc.URLPARAMETERS";
+    public static final String EXTRA_LOOPBACK = "org.appspot.apprtc.LOOPBACK";
+    public static final String EXTRA_VIDEO_CALL = "org.appspot.apprtc.VIDEO_CALL";
+    public static final String EXTRA_SCREENCAPTURE = "org.appspot.apprtc.SCREENCAPTURE";
+    public static final String EXTRA_CAMERA2 = "org.appspot.apprtc.CAMERA2";
+    public static final String EXTRA_VIDEO_WIDTH = "org.appspot.apprtc.VIDEO_WIDTH";
+    public static final String EXTRA_VIDEO_HEIGHT = "org.appspot.apprtc.VIDEO_HEIGHT";
+    public static final String EXTRA_VIDEO_FPS = "org.appspot.apprtc.VIDEO_FPS";
     public static final String EXTRA_VIDEO_CAPTUREQUALITYSLIDER_ENABLED =
-            "com.example.lglcamera.VIDEO_CAPTUREQUALITYSLIDER";
-    public static final String EXTRA_VIDEO_BITRATE = "com.example.lglcamera.VIDEO_BITRATE";
-    public static final String EXTRA_VIDEOCODEC = "com.example.lglcamera.VIDEOCODEC";
-    public static final String EXTRA_HWCODEC_ENABLED = "com.example.lglcamera.HWCODEC";
-    public static final String EXTRA_CAPTURETOTEXTURE_ENABLED = "com.example.lglcamera.CAPTURETOTEXTURE";
-    public static final String EXTRA_FLEXFEC_ENABLED = "com.example.lglcamera.FLEXFEC";
-    public static final String EXTRA_AUDIO_BITRATE = "com.example.lglcamera.AUDIO_BITRATE";
-    public static final String EXTRA_AUDIOCODEC = "com.example.lglcamera.AUDIOCODEC";
+            "org.appsopt.apprtc.VIDEO_CAPTUREQUALITYSLIDER";
+    public static final String EXTRA_VIDEO_BITRATE = "org.appspot.apprtc.VIDEO_BITRATE";
+    public static final String EXTRA_VIDEOCODEC = "org.appspot.apprtc.VIDEOCODEC";
+    public static final String EXTRA_HWCODEC_ENABLED = "org.appspot.apprtc.HWCODEC";
+    public static final String EXTRA_CAPTURETOTEXTURE_ENABLED = "org.appspot.apprtc.CAPTURETOTEXTURE";
+    public static final String EXTRA_FLEXFEC_ENABLED = "org.appspot.apprtc.FLEXFEC";
+    public static final String EXTRA_AUDIO_BITRATE = "org.appspot.apprtc.AUDIO_BITRATE";
+    public static final String EXTRA_AUDIOCODEC = "org.appspot.apprtc.AUDIOCODEC";
     public static final String EXTRA_NOAUDIOPROCESSING_ENABLED =
-            "com.example.lglcamera.NOAUDIOPROCESSING";
-    public static final String EXTRA_AECDUMP_ENABLED = "com.example.lglcamera.AECDUMP";
-    public static final String EXTRA_OPENSLES_ENABLED = "com.example.lglcamera.OPENSLES";
-    public static final String EXTRA_DISABLE_BUILT_IN_AEC = "com.example.lglcamera.DISABLE_BUILT_IN_AEC";
-    public static final String EXTRA_DISABLE_BUILT_IN_AGC = "com.example.lglcamera.DISABLE_BUILT_IN_AGC";
-    public static final String EXTRA_DISABLE_BUILT_IN_NS = "com.example.lglcamera.DISABLE_BUILT_IN_NS";
-    public static final String EXTRA_ENABLE_LEVEL_CONTROL = "com.example.lglcamera.ENABLE_LEVEL_CONTROL";
+            "org.appspot.apprtc.NOAUDIOPROCESSING";
+    public static final String EXTRA_AECDUMP_ENABLED = "org.appspot.apprtc.AECDUMP";
+    public static final String EXTRA_OPENSLES_ENABLED = "org.appspot.apprtc.OPENSLES";
+    public static final String EXTRA_DISABLE_BUILT_IN_AEC = "org.appspot.apprtc.DISABLE_BUILT_IN_AEC";
+    public static final String EXTRA_DISABLE_BUILT_IN_AGC = "org.appspot.apprtc.DISABLE_BUILT_IN_AGC";
+    public static final String EXTRA_DISABLE_BUILT_IN_NS = "org.appspot.apprtc.DISABLE_BUILT_IN_NS";
+    public static final String EXTRA_ENABLE_LEVEL_CONTROL = "org.appspot.apprtc.ENABLE_LEVEL_CONTROL";
     public static final String EXTRA_DISABLE_WEBRTC_AGC_AND_HPF =
-            "com.example.lglcamera.DISABLE_WEBRTC_GAIN_CONTROL";
-    public static final String EXTRA_DISPLAY_HUD = "com.example.lglcamera.DISPLAY_HUD";
-    public static final String EXTRA_TRACING = "com.example.lglcamera.TRACING";
-    public static final String EXTRA_CMDLINE = "com.example.lglcamera.CMDLINE";
-    public static final String EXTRA_RUNTIME = "com.example.lglcamera.RUNTIME";
-    public static final String EXTRA_VIDEO_FILE_AS_CAMERA = "com.example.lglcamera.VIDEO_FILE_AS_CAMERA";
+            "org.appspot.apprtc.DISABLE_WEBRTC_GAIN_CONTROL";
+    public static final String EXTRA_DISPLAY_HUD = "org.appspot.apprtc.DISPLAY_HUD";
+    public static final String EXTRA_TRACING = "org.appspot.apprtc.TRACING";
+    public static final String EXTRA_CMDLINE = "org.appspot.apprtc.CMDLINE";
+    public static final String EXTRA_RUNTIME = "org.appspot.apprtc.RUNTIME";
+    public static final String EXTRA_VIDEO_FILE_AS_CAMERA = "org.appspot.apprtc.VIDEO_FILE_AS_CAMERA";
     public static final String EXTRA_SAVE_REMOTE_VIDEO_TO_FILE =
-            "com.example.lglcamera.SAVE_REMOTE_VIDEO_TO_FILE";
+            "org.appspot.apprtc.SAVE_REMOTE_VIDEO_TO_FILE";
     public static final String EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_WIDTH =
-            "com.example.lglcamera.SAVE_REMOTE_VIDEO_TO_FILE_WIDTH";
+            "org.appspot.apprtc.SAVE_REMOTE_VIDEO_TO_FILE_WIDTH";
     public static final String EXTRA_SAVE_REMOTE_VIDEO_TO_FILE_HEIGHT =
-            "com.example.lglcamera.SAVE_REMOTE_VIDEO_TO_FILE_HEIGHT";
+            "org.appspot.apprtc.SAVE_REMOTE_VIDEO_TO_FILE_HEIGHT";
     public static final String EXTRA_USE_VALUES_FROM_INTENT =
-            "com.example.lglcamera.USE_VALUES_FROM_INTENT";
-    public static final String EXTRA_DATA_CHANNEL_ENABLED = "com.example.lglcamera.DATA_CHANNEL_ENABLED";
-    public static final String EXTRA_ORDERED = "com.example.lglcamera.ORDERED";
-    public static final String EXTRA_MAX_RETRANSMITS_MS = "com.example.lglcamera.MAX_RETRANSMITS_MS";
-    public static final String EXTRA_MAX_RETRANSMITS = "com.example.lglcamera.MAX_RETRANSMITS";
-    public static final String EXTRA_PROTOCOL = "com.example.lglcamera.PROTOCOL";
-    public static final String EXTRA_NEGOTIATED = "com.example.lglcamera.NEGOTIATED";
-    public static final String EXTRA_ID = "com.example.lglcamera.ID";
+            "org.appspot.apprtc.USE_VALUES_FROM_INTENT";
+    public static final String EXTRA_DATA_CHANNEL_ENABLED = "org.appspot.apprtc.DATA_CHANNEL_ENABLED";
+    public static final String EXTRA_ORDERED = "org.appspot.apprtc.ORDERED";
+    public static final String EXTRA_MAX_RETRANSMITS_MS = "org.appspot.apprtc.MAX_RETRANSMITS_MS";
+    public static final String EXTRA_MAX_RETRANSMITS = "org.appspot.apprtc.MAX_RETRANSMITS";
+    public static final String EXTRA_PROTOCOL = "org.appspot.apprtc.PROTOCOL";
+    public static final String EXTRA_NEGOTIATED = "org.appspot.apprtc.NEGOTIATED";
+    public static final String EXTRA_ID = "org.appspot.apprtc.ID";
 
     private static final int CAPTURE_PERMISSION_REQUEST_CODE = 1;
 
@@ -761,7 +773,8 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
         if (peerConnectionParameters.videoCallEnabled) {
             videoCapturer = createVideoCapturer();
         }
-        peerConnectionClient.createPeerConnection(localProxyVideoSink, remoteRenderers, videoCapturer, signalingParameters);
+        peerConnectionClient.createPeerConnection(
+                localProxyVideoSink, remoteRenderers, videoCapturer, signalingParameters);
 
         if (signalingParameters.initiator) {
             logAndToast("Creating OFFER...");
