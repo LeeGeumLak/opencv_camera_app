@@ -12,13 +12,11 @@ package com.example.lglcamera;
 
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
 
 /**
  * Control capture format based on a seekbar listener.
@@ -49,7 +47,7 @@ public class CaptureQualityController implements SeekBar.OnSeekBarChangeListener
             int firstFps = calculateFramerate(targetBandwidth, first);
             int secondFps = calculateFramerate(targetBandwidth, second);
 
-            if ((firstFps >= FRAMERATE_THRESHOLD && secondFps >= FRAMERATE_THRESHOLD)
+            if (firstFps >= FRAMERATE_THRESHOLD && secondFps >= FRAMERATE_THRESHOLD
                     || firstFps == secondFps) {
                 // Compare resolution.
                 return first.width * first.height - second.width * second.height;
@@ -71,7 +69,7 @@ public class CaptureQualityController implements SeekBar.OnSeekBarChangeListener
         }
 
         // Extract max bandwidth (in millipixels / second).
-        long maxCaptureBandwidth = Long.MIN_VALUE;
+        long maxCaptureBandwidth = java.lang.Long.MIN_VALUE;
         for (CaptureFormat format : formats) {
             maxCaptureBandwidth =
                     Math.max(maxCaptureBandwidth, (long) format.width * format.height * format.framerate.max);
@@ -96,8 +94,7 @@ public class CaptureQualityController implements SeekBar.OnSeekBarChangeListener
     }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-    }
+    public void onStartTrackingTouch(SeekBar seekBar) {}
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {

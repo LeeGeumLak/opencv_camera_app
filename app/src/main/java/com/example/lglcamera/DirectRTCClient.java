@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
+import org.webrtc.PeerConnection;
 import org.webrtc.SessionDescription;
 
 import java.util.LinkedList;
@@ -55,7 +56,7 @@ public class DirectRTCClient implements AppRTCClient, TCPChannelClient.TCPChanne
     private TCPChannelClient tcpClient;
     private RoomConnectionParameters connectionParameters;
 
-    private enum ConnectionState {NEW, CONNECTED, CLOSED, ERROR}
+    private enum ConnectionState { NEW, CONNECTED, CLOSED, ERROR }
 
     // All alterations of the room state should be done from inside the looper thread.
     private ConnectionState roomState;
@@ -99,7 +100,7 @@ public class DirectRTCClient implements AppRTCClient, TCPChannelClient.TCPChanne
 
     /**
      * Connects to the room.
-     * <p>
+     *
      * Runs on the looper thread.
      */
     private void connectToRoomInternal() {
@@ -133,7 +134,7 @@ public class DirectRTCClient implements AppRTCClient, TCPChannelClient.TCPChanne
 
     /**
      * Disconnects from the room.
-     * <p>
+     *
      * Runs on the looper thread.
      */
     private void disconnectFromRoomInternal() {
@@ -196,9 +197,7 @@ public class DirectRTCClient implements AppRTCClient, TCPChannelClient.TCPChanne
         });
     }
 
-    /**
-     * Send removed Ice candidates to the other participant.
-     */
+    /** Send removed Ice candidates to the other participant. */
     @Override
     public void sendLocalIceCandidateRemovals(final IceCandidate[] candidates) {
         executor.execute(new Runnable() {
@@ -234,7 +233,7 @@ public class DirectRTCClient implements AppRTCClient, TCPChannelClient.TCPChanne
 
             SignalingParameters parameters = new SignalingParameters(
                     // Ice servers are not needed for direct connections.
-                    new LinkedList<>(),
+                    new LinkedList<PeerConnection.IceServer>(),
                     isServer, // Server side acts as the initiator on direct connections.
                     null, // clientId
                     null, // wssUrl
@@ -270,7 +269,7 @@ public class DirectRTCClient implements AppRTCClient, TCPChannelClient.TCPChanne
 
                 SignalingParameters parameters = new SignalingParameters(
                         // Ice servers are not needed for direct connections.
-                        new LinkedList<>(),
+                        new LinkedList<PeerConnection.IceServer>(),
                         false, // This code will only be run on the client side. So, we are not the initiator.
                         null, // clientId
                         null, // wssUrl

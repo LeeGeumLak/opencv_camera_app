@@ -39,6 +39,7 @@ public class RoomParametersFetcher {
     private final RoomParametersFetcherEvents events;
     private final String roomUrl;
     private final String roomMessage;
+    private AsyncHttpURLConnection httpConnection;
 
     /**
      * Room parameters fetcher callbacks.
@@ -65,7 +66,7 @@ public class RoomParametersFetcher {
 
     public void makeRequest() {
         Log.d(TAG, "Connecting to room: " + roomUrl);
-        AsyncHttpURLConnection httpConnection =
+        httpConnection =
                 new AsyncHttpURLConnection("POST", roomUrl, roomMessage, new AsyncHttpEvents() {
                     @Override
                     public void onHttpError(String errorMessage) {
@@ -101,7 +102,7 @@ public class RoomParametersFetcher {
             String wssPostUrl = roomJson.getString("wss_post_url");
             boolean initiator = (roomJson.getBoolean("is_initiator"));
             if (!initiator) {
-                iceCandidates = new LinkedList<>();
+                iceCandidates = new LinkedList<IceCandidate>();
                 String messagesString = roomJson.getString("messages");
                 JSONArray messages = new JSONArray(messagesString);
                 for (int i = 0; i < messages.length(); ++i) {
@@ -131,11 +132,9 @@ public class RoomParametersFetcher {
             boolean isTurnPresent = false;
             for (PeerConnection.IceServer server : iceServers) {
                 Log.d(TAG, "IceServer: " + server);
-                for (String uri : server.urls) {
-                    if (uri.startsWith("turn:")) {
-                        isTurnPresent = true;
-                        break;
-                    }
+                if (server.uri.startsWith("turn:")) {
+                    isTurnPresent = true;
+                    break;
                 }
             }
             // Request TURN servers.
@@ -162,7 +161,7 @@ public class RoomParametersFetcher {
     // off the main thread!
     private LinkedList<PeerConnection.IceServer> requestTurnServers(String url)
             throws IOException, JSONException {
-        LinkedList<PeerConnection.IceServer> turnServers = new LinkedList<>();
+        LinkedList<PeerConnection.IceServer> turnServers = new LinkedList<PeerConnection.IceServer>();
         Log.d(TAG, "Request TURN from: " + url);
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setDoOutput(true);
@@ -187,12 +186,7 @@ public class RoomParametersFetcher {
             String credential = server.has("credential") ? server.getString("credential") : "";
             for (int j = 0; j < turnUrls.length(); j++) {
                 String turnUrl = turnUrls.getString(j);
-                PeerConnection.IceServer turnServer =
-                        PeerConnection.IceServer.builder(turnUrl)
-                                .setUsername(username)
-                                .setPassword(credential)
-                                .createIceServer();
-                turnServers.add(turnServer);
+                turnServers.add(new PeerConnection.IceServer(turnUrl, username, credential));
             }
         }
         return turnServers;
@@ -204,16 +198,12 @@ public class RoomParametersFetcher {
             throws JSONException {
         JSONObject json = new JSONObject(pcConfig);
         JSONArray servers = json.getJSONArray("iceServers");
-        LinkedList<PeerConnection.IceServer> ret = new LinkedList<>();
+        LinkedList<PeerConnection.IceServer> ret = new LinkedList<PeerConnection.IceServer>();
         for (int i = 0; i < servers.length(); ++i) {
             JSONObject server = servers.getJSONObject(i);
             String url = server.getString("urls");
             String credential = server.has("credential") ? server.getString("credential") : "";
-            PeerConnection.IceServer turnServer =
-                    PeerConnection.IceServer.builder(url)
-                            .setPassword(credential)
-                            .createIceServer();
-            ret.add(turnServer);
+            ret.add(new PeerConnection.IceServer(url, "", credential));
         }
         return ret;
     }

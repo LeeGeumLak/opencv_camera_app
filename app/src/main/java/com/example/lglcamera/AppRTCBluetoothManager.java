@@ -10,6 +10,9 @@
 
 package com.example.lglcamera;
 
+import com.example.lglcamera.util.AppRTCUtils;
+
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -25,12 +28,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
 import android.util.Log;
-
-import com.example.lglcamera.util.AppRTCUtils;
-import org.webrtc.ThreadUtils;
-
 import java.util.List;
 import java.util.Set;
+import org.webrtc.ThreadUtils;
+
 
 /**
  * AppRTCProximitySensor manages functions related to Bluetoth devices in the
@@ -189,11 +190,9 @@ public class AppRTCBluetoothManager {
             }
             Log.d(TAG, "onReceive done: BT state=" + bluetoothState);
         }
-    }
+    };
 
-    /**
-     * Construction.
-     */
+    /** Construction. */
     static AppRTCBluetoothManager create(Context context, AppRTCAudioManager audioManager) {
         Log.d(TAG, "create" + AppRTCUtils.getThreadInfo());
         return new AppRTCBluetoothManager(context, audioManager);
@@ -211,9 +210,7 @@ public class AppRTCBluetoothManager {
         handler = new Handler(Looper.getMainLooper());
     }
 
-    /**
-     * Returns the internal state.
-     */
+    /** Returns the internal state. */
     public State getState() {
         ThreadUtils.checkIsOnMainThread();
         return bluetoothState;
@@ -227,8 +224,8 @@ public class AppRTCBluetoothManager {
      * if/when the BT headset is enabled.
      * Example of state change sequence when start() is called while BT device
      * is connected and enabled:
-     * UNINITIALIZED --> HEADSET_UNAVAILABLE --> HEADSET_AVAILABLE -->
-     * SCO_CONNECTING --> SCO_CONNECTED <==> audio is now routed via BT SCO.
+     *   UNINITIALIZED --> HEADSET_UNAVAILABLE --> HEADSET_AVAILABLE -->
+     *   SCO_CONNECTING --> SCO_CONNECTED <==> audio is now routed via BT SCO.
      * Note that the AppRTCAudioManager is also involved in driving this state
      * change.
      */
@@ -279,9 +276,7 @@ public class AppRTCBluetoothManager {
         Log.d(TAG, "start done: BT state=" + bluetoothState);
     }
 
-    /**
-     * Stops and closes all components related to Bluetooth audio.
-     */
+    /** Stops and closes all components related to Bluetooth audio. */
     public void stop() {
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "stop: BT state=" + bluetoothState);
@@ -347,9 +342,7 @@ public class AppRTCBluetoothManager {
         return true;
     }
 
-    /**
-     * Stops Bluetooth SCO connection with remote device.
-     */
+    /** Stops Bluetooth SCO connection with remote device. */
     public void stopScoAudio() {
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "stopScoAudio: BT state=" + bluetoothState + ", "
@@ -422,9 +415,7 @@ public class AppRTCBluetoothManager {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    /**
-     * Logs the state of the local Bluetooth adapter.
-     */
+    /** Logs the state of the local Bluetooth adapter. */
     @SuppressLint("HardwareIds")
     protected void logBluetoothAdapterInfo(BluetoothAdapter localAdapter) {
         Log.d(TAG, "BluetoothAdapter: "
@@ -442,27 +433,21 @@ public class AppRTCBluetoothManager {
         }
     }
 
-    /**
-     * Ensures that the audio manager updates its list of available audio devices.
-     */
+    /** Ensures that the audio manager updates its list of available audio devices. */
     private void updateAudioDeviceState() {
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "updateAudioDeviceState");
         apprtcAudioManager.updateAudioDeviceState();
     }
 
-    /**
-     * Starts timer which times out after BLUETOOTH_SCO_TIMEOUT_MS milliseconds.
-     */
+    /** Starts timer which times out after BLUETOOTH_SCO_TIMEOUT_MS milliseconds. */
     private void startTimer() {
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "startTimer");
         handler.postDelayed(bluetoothTimeoutRunnable, BLUETOOTH_SCO_TIMEOUT_MS);
     }
 
-    /**
-     * Cancels any outstanding timer tasks.
-     */
+    /** Cancels any outstanding timer tasks. */
     private void cancelTimer() {
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "cancelTimer");
@@ -509,16 +494,12 @@ public class AppRTCBluetoothManager {
         Log.d(TAG, "bluetoothTimeout done: BT state=" + bluetoothState);
     }
 
-    /**
-     * Checks whether audio uses Bluetooth SCO.
-     */
+    /** Checks whether audio uses Bluetooth SCO. */
     private boolean isScoOn() {
         return audioManager.isBluetoothScoOn();
     }
 
-    /**
-     * Converts BluetoothAdapter states into local string representations.
-     */
+    /** Converts BluetoothAdapter states into local string representations. */
     private String stateToString(int state) {
         switch (state) {
             case BluetoothAdapter.STATE_DISCONNECTED:
@@ -540,7 +521,7 @@ public class AppRTCBluetoothManager {
             case BluetoothAdapter.STATE_TURNING_ON:
                 // Indicates the local Bluetooth adapter is turning on. However local clients should wait
                 // for STATE_ON before attempting to use the adapter.
-                return "TURNING_ON";
+                return  "TURNING_ON";
             default:
                 return "INVALID";
         }
