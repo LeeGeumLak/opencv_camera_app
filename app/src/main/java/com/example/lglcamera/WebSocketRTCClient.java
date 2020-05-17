@@ -28,7 +28,7 @@ import org.webrtc.SessionDescription;
 /**
  * Negotiates signaling for chatting with https://appr.tc "rooms".
  * Uses the client<->server specifics of the apprtc AppEngine webapp.
- *
+ * <p>
  * <p>To use: create an instance of this object (registering a message handler) and
  * call connectToRoom().  Once room connection is established
  * onConnectedToRoom() callback with room parameters is invoked.
@@ -41,9 +41,9 @@ public class WebSocketRTCClient implements AppRTCClient, WebSocketChannelEvents 
     private static final String ROOM_MESSAGE = "message";
     private static final String ROOM_LEAVE = "leave";
 
-    private enum ConnectionState { NEW, CONNECTED, CLOSED, ERROR }
+    private enum ConnectionState {NEW, CONNECTED, CLOSED, ERROR}
 
-    private enum MessageType { MESSAGE, LEAVE }
+    private enum MessageType {MESSAGE, LEAVE}
 
     private final Handler handler;
     private boolean initiator;
@@ -420,7 +420,7 @@ public class WebSocketRTCClient implements AppRTCClient, WebSocketChannelEvents 
     }
 
     // Converts a JSON candidate to a Java object.
-    private IceCandidate toJavaCandidate(JSONObject json) throws JSONException {
+    IceCandidate toJavaCandidate(JSONObject json) throws JSONException {
         return new IceCandidate(
                 json.getString("id"), json.getInt("label"), json.getString("candidate"));
     }

@@ -28,6 +28,7 @@ public interface AppRTCClient {
         public final String roomId;
         public final boolean loopback;
         public final String urlParameters;
+
         public RoomConnectionParameters(
                 String roomUrl, String roomId, boolean loopback, String urlParameters) {
             this.roomUrl = roomUrl;
@@ -35,6 +36,7 @@ public interface AppRTCClient {
             this.loopback = loopback;
             this.urlParameters = urlParameters;
         }
+
         public RoomConnectionParameters(String roomUrl, String roomId, boolean loopback) {
             this(roomUrl, roomId, loopback, null /* urlParameters */);
         }
@@ -99,7 +101,7 @@ public interface AppRTCClient {
 
     /**
      * Callback interface for messages delivered on signaling channel.
-     *
+     * <p>
      * <p>Methods are guaranteed to be invoked on the UI thread of |activity|.
      */
     interface SignalingEvents {

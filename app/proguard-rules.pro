@@ -14,9 +14,3 @@
     <list default="true" id="6e8a8a4d-0d57-44e4-a26a-6758a5f5d5eb" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/re
-
--dontwarn android.support.**
--keep class org.webrtc.** { *; }
--keep class com.example.lglcamera.**  { *; }
--keep class de.tavendo.autobahn.**  { *; }
--keepclasseswithmembernames class * { native <methods>; }

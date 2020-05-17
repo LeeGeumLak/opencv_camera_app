@@ -15,11 +15,6 @@ import android.util.Log;
 
 import com.example.lglcamera.util.AsyncHttpURLConnection;
 import com.example.lglcamera.util.AsyncHttpURLConnection.AsyncHttpEvents;
-
-import de.tavendo.autobahn.WebSocket.WebSocketConnectionObserver;
-import de.tavendo.autobahn.WebSocketConnection;
-import de.tavendo.autobahn.WebSocketException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,26 +22,31 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 
+import de.tavendo.autobahn.WebSocket.WebSocketConnectionObserver;
+import de.tavendo.autobahn.WebSocketConnection;
+import de.tavendo.autobahn.WebSocketException;
+
 /**
  * WebSocket client implementation.
- *
+ * <p>
  * <p>All public methods should be called from a looper executor thread
  * passed in a constructor, otherwise exception will be thrown.
  * All events are dispatched on the same thread.
  */
-
 public class WebSocketChannelClient {
     private static final String TAG = "WSChannelRTCClient";
     private static final int CLOSE_TIMEOUT = 1000;
     private final WebSocketChannelEvents events;
     private final Handler handler;
     private WebSocketConnection ws;
-    private WebSocketObserver wsObserver;
     private String wsServerUrl;
     private String postServerUrl;
     private String roomID;
     private String clientID;
     private WebSocketConnectionState state;
+    // Do not remove this member variable. If this is removed, the observer gets garbage collected and
+    // this causes test breakages.
+    private WebSocketObserver wsObserver;
     private final Object closeEventLock = new Object();
     private boolean closeEvent;
     // WebSocket send queue. Messages are added to the queue when WebSocket
@@ -56,7 +56,9 @@ public class WebSocketChannelClient {
     /**
      * Possible WebSocket connection states.
      */
-    public enum WebSocketConnectionState { NEW, CONNECTED, REGISTERED, CLOSED, ERROR }
+    public enum WebSocketConnectionState {
+        NEW, CONNECTED, REGISTERED, CLOSED, ERROR
+    }
 
     /**
      * Callback interface for messages delivered on WebSocket.
@@ -64,7 +66,9 @@ public class WebSocketChannelClient {
      */
     public interface WebSocketChannelEvents {
         void onWebSocketMessage(final String message);
+
         void onWebSocketClose();
+
         void onWebSocketError(final String description);
     }
 
@@ -73,7 +77,7 @@ public class WebSocketChannelClient {
         this.events = events;
         roomID = null;
         clientID = null;
-        wsSendQueue = new LinkedList<String>();
+        wsSendQueue = new LinkedList<>();
         state = WebSocketConnectionState.NEW;
     }
 
@@ -224,7 +228,8 @@ public class WebSocketChannelClient {
                     }
 
                     @Override
-                    public void onHttpComplete(String response) {}
+                    public void onHttpComplete(String response) {
+                    }
                 });
         httpConnection.send();
     }
@@ -288,9 +293,11 @@ public class WebSocketChannelClient {
         }
 
         @Override
-        public void onRawTextMessage(byte[] payload) {}
+        public void onRawTextMessage(byte[] payload) {
+        }
 
         @Override
-        public void onBinaryMessage(byte[] payload) {}
+        public void onBinaryMessage(byte[] payload) {
+        }
     }
 }
