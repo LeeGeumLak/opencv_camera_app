@@ -35,6 +35,7 @@ public class AsyncHttpURLConnection {
      */
     public interface AsyncHttpEvents {
         void onHttpError(String errorMessage);
+
         void onHttpComplete(String response);
     }
 
@@ -50,12 +51,7 @@ public class AsyncHttpURLConnection {
     }
 
     public void send() {
-        Runnable runHttp = new Runnable() {
-            public void run() {
-                sendHttpMessage();
-            }
-        };
-        new Thread(runHttp).start();
+        new Thread(this::sendHttpMessage).start();
     }
 
     private void sendHttpMessage() {
