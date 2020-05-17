@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.lglcamera"
-        minSdkVersion 26
+        minSdkVersion 18
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -96,11 +96,12 @@ dependencies {
     implementation 'com.rmtheis:tess-two:9.1.0'
     implementation 'com.google.android.material:material:1.1.0'
 
-    compile files('libs/audio_device_java.jar')
-//    compile files('libs/audio_device_java__compile_java.javac.jar')
-    compile files('libs/autobanh.jar')
-    compile files('libs/base_java.jar')
-//    compile files('libs/libjingle_peerconnection_java.jar')
-    compile files('libs/libjingle_peerconnection.jar')
+    //implementation files('libs/audio_device_java.jar')
+    //implementation files('libs/libjingle_peerconnection.jar')
+
+//    implementation files('libs/audio_device_java__compile_java.javac.jar')
+//    implementation files('libs/autobanh.jar')
+//    implementation files('libs/base_java.jar')
+//    implementation files('libs/libjingle_peerconnection_java.jar')
 
 }

@@ -506,6 +506,7 @@ class CpuMonitor {
             Log.e(TAG, "Problems reading /proc/stat", e);
             return null;
         }
+
         return new ProcStat(userTime, systemTime, idleTime);
     }
 }
