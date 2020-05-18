@@ -386,7 +386,13 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
     cascade = *(CascadeClassifier *)cascadeClassifier_face;
     nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
 
-    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
+    Mat glasses;
+    glasses = imread(glassesImage, IMREAD_UNCHANGED);
+    if (glasses.empty()){
+
+        cout << "Could not read image - " << glassesImage << endl;
+        return -1;
+    }
 
     detectAndSunglasses(img_result, cascade, nestedCascade, scale, tryflip, glasses);
 
