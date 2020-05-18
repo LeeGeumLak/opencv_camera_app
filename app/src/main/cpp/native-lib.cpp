@@ -117,8 +117,7 @@ void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifie
     Mat result;
 
     printf( "detection time = %g ms\n", t*1000/getTickFrequency());
-    for ( size_t i = 0; i < faces.size(); i++ )
-    {
+    for ( size_t i = 0; i < faces.size(); i++ ) {
         Rect r = faces[i];
         Mat smallImgROI;
         vector<Rect> nestedObjects;
@@ -130,17 +129,17 @@ void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifie
 
         double aspect_ratio = (double)r.width/r.height;
 
-        if( 0.75 < aspect_ratio && aspect_ratio < 1.3 )
-        {
+        if( 0.75 < aspect_ratio && aspect_ratio < 1.3 ) {
             center.x = cvRound((r.x + r.width*0.5)*scale);
             center.y = cvRound((r.y + r.height*0.5)*scale);
             radius = cvRound((r.width + r.height)*0.25*scale);
             circle( img, center, radius, color, 3, 8, 0 );
         }
-        else
-            rectangle( img, Point(cvRound(r.x*scale), cvRound(r.y*scale)),
-                       Point(cvRound((r.x + r.width-1)*scale), cvRound((r.y + r.height-1)*scale)),
-                       color, 3, 8, 0);
+        else {
+            rectangle(img, Point(cvRound(r.x * scale), cvRound(r.y * scale)),
+                      Point(cvRound((r.x + r.width - 1) * scale), cvRound((r.y + r.height - 1) * scale)), color, 3, 8, 0);
+        }
+
         if( nestedCascade.empty() ){
             cout<<"nestedCascade.empty()"<<endl;
             continue;
@@ -160,8 +159,7 @@ void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifie
 
         vector<Point> points;
 
-        for ( size_t j = 0; j < nestedObjects.size(); j++ )
-        {
+        for ( size_t j = 0; j < nestedObjects.size(); j++ ) {
             Rect nr = nestedObjects[j];
             center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
             center.y = cvRound((r.y + nr.y + nr.height*0.5)*scale);
@@ -376,92 +374,106 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
     Mat &img_result = *(Mat *) mat_addr_Result;
     img_result = img_input.clone();
 
-    Mat output2;
-    img_result.copyTo(output2);
+    //Mat output2;
+    //img_result.copyTo(output2);
 
-    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 2);
-
-    vector<Rect> faces;
-    Mat img_gray;
-
-    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 3);
-
-    cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
-    equalizeHist(img_gray, img_gray);
-    Mat img_resize;
-    float resizeRatio = imgResize(img_gray, img_resize, 640);
-
-    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 4);
-
-    //-- Detect faces
-    ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces, 1.1, 2, 0|CASCADE_SCALE_IMAGE, Size(30, 30) );
-
-    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ", (char *) "face %d found ", faces.size());
-
-    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 5);
-
-    for (int i = 0; i < faces.size(); i++) {
-        double real_facesize_x = faces[i].x / resizeRatio;
-        double real_facesize_y = faces[i].y / resizeRatio;
-        double real_facesize_width = faces[i].width / resizeRatio;
-        double real_facesize_height = faces[i].height / resizeRatio;
-
-        Point center( real_facesize_x + real_facesize_width / 2, real_facesize_y + real_facesize_height/2);
-
-        ellipse(img_result, center, Size( real_facesize_width / 2, real_facesize_height / 2), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
-
-        Rect face_area(real_facesize_x, real_facesize_y, real_facesize_width,real_facesize_height);
-
-        Mat faceROI = img_gray( face_area );
-
-        vector<Rect> eyes;
-
-        //-- In each face, detect eyes
-        ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CASCADE_SCALE_IMAGE, Size(20, 20) );
-        for ( size_t j = 0; j < eyes.size(); j++ ) {
-            Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
-
-            int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
-            circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
-            /*Mat &img_input = *(Mat *) mat_addr_Input;
-            Mat &img_result = *(Mat *) mat_addr_Result;
-
-            img_result = img_input;
-
-            String glassesImage = "sunglasses.png";
-            bool tryflip = false;
-            double scale;
-            scale = 1;
-
-            Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
-
-            CascadeClassifier cascade, nestedCascade;
-            cascade = *(CascadeClassifier *)cascadeClassifier_face;
-            nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
-
-            detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
-        }
-    }
-
-    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);*/
-
-    /*Mat &img_input = *(Mat *) mat_addr_Input;
-    Mat &img_result = *(Mat *) mat_addr_Result;
-
-    img_result = img_input;
-
-    String glassesImage = "sunglasses.png";
+    String glassesImage = "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/sunglasses.png";
     bool tryflip = false;
     double scale;
     scale = 1;
-
-    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
 
     CascadeClassifier cascade, nestedCascade;
     cascade = *(CascadeClassifier *)cascadeClassifier_face;
     nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
 
-    detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
+    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
+
+    detectAndSunglasses(img_result, cascade, nestedCascade, scale, tryflip, glasses);
+
+    //---------------------------------------------------------------------------------
+//    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 2);
+//
+//    vector<Rect> faces;
+//    Mat img_gray;
+//
+//    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 3);
+//
+//    cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
+//    equalizeHist(img_gray, img_gray);
+//    Mat img_resize;
+//    float resizeRatio = imgResize(img_gray, img_resize, 640);
+//
+//    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 4);
+//
+//    //-- Detect faces
+//    ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces, 1.1, 2, 0|CASCADE_SCALE_IMAGE, Size(30, 30) );
+//
+//    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ", (char *) "face %d found ", faces.size());
+//
+//    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 5);
+//
+//    for (int i = 0; i < faces.size(); i++) {
+//        double real_facesize_x = faces[i].x / resizeRatio;
+//        double real_facesize_y = faces[i].y / resizeRatio;
+//        double real_facesize_width = faces[i].width / resizeRatio;
+//        double real_facesize_height = faces[i].height / resizeRatio;
+//
+//        Point center( real_facesize_x + real_facesize_width / 2, real_facesize_y + real_facesize_height/2);
+//
+//        ellipse(img_result, center, Size( real_facesize_width / 2, real_facesize_height / 2), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
+//
+//        Rect face_area(real_facesize_x, real_facesize_y, real_facesize_width,real_facesize_height);
+//
+//        Mat faceROI = img_gray( face_area );
+//
+//        vector<Rect> eyes;
+//
+//        //-- In each face, detect eyes
+//        ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CASCADE_SCALE_IMAGE, Size(15, 15) );
+//        for ( size_t j = 0; j < eyes.size(); j++ ) {
+//            Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
+//
+//            int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+//            circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
+//            /*Mat &img_input = *(Mat *) mat_addr_Input;
+//            Mat &img_result = *(Mat *) mat_addr_Result;
+//
+//            img_result = img_input;
+//
+//            String glassesImage = "sunglasses.png";
+//            bool tryflip = false;
+//            double scale;
+//            scale = 1;
+//
+//            Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
+//
+//            CascadeClassifier cascade, nestedCascade;
+//            cascade = *(CascadeClassifier *)cascadeClassifier_face;
+//            nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
+//
+//            detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
+//        }
+//    }
+//
+//    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);*/
+//
+//    /*Mat &img_input = *(Mat *) mat_addr_Input;
+//    Mat &img_result = *(Mat *) mat_addr_Result;
+//
+//    img_result = img_input;
+//
+//    String glassesImage = "sunglasses.png";
+//    bool tryflip = false;
+//    double scale;
+//    scale = 1;
+//
+//    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
+//
+//    CascadeClassifier cascade, nestedCascade;
+//    cascade = *(CascadeClassifier *)cascadeClassifier_face;
+//    nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
+//
+//    detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
 }
 
 // rgb -> gray
