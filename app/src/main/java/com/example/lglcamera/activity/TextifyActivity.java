@@ -33,6 +33,8 @@ public class TextifyActivity extends AppCompatActivity {
     CameraSurfaceView surfaceView;
     TextView textView;
 
+    private final String[] languageList = {"eng","kor"}; // 언어
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,18 +62,74 @@ public class TextifyActivity extends AppCompatActivity {
             }
         });
 
+
+        /*String mDataPath = ""; //언어데이터가 있는 경로
+        TessBaseAPI m_Tess; //Tess API reference
+
+        //언어파일 경로
+        mDataPath = getFilesDir() + "/tesseract/";
+
+        //트레이닝데이터가 카피되어 있는지 체크
+        String lang = "";
+        for (String Language : languageList) {
+            checkFile(new File(mDataPath + "tessdata/"), Language);
+            lang += Language + "+";
+        }
+        m_Tess = new TessBaseAPI();
+        m_Tess.init(mDataPath, lang);*/
+
+
         tessBaseAPI = new TessBaseAPI();
         String dir = getFilesDir() + "/tesseract";
         if(checkLanguageFile(dir+"/tessdata"))
             tessBaseAPI.init(dir, "eng");
     }
 
+    /*//copy file to device
+    private void copyFiles(String Language) {
+        try {
+            String filepath = mDataPath + "/tessdata/" + Language + ".traineddata";
+            AssetManager assetManager = getAssets();
+            InputStream instream = assetManager.open("tessdata/"+Language+".traineddata");
+            OutputStream outstream = new FileOutputStream(filepath);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = instream.read(buffer)) != -1) {
+                outstream.write(buffer, 0, read);
+            }
+            outstream.flush();
+            outstream.close();
+            instream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //check file on the device
+    private void checkFile(File dir, String Language) {
+        //디렉토리가 없으면 디렉토리를 만들고 그후에 파일을 카피
+        if (!dir.exists() && dir.mkdirs()) {
+            copyFiles(Language);
+        }
+        //디렉토리가 있지만 파일이 없으면 파일카피 진행
+        if (dir.exists()) {
+            String datafilepath = mDataPath + "tessdata/" + Language + ".traineddata";
+            File datafile = new File(datafilepath);
+            if (!datafile.exists()) {
+                copyFiles(Language);
+            }
+        }
+    }*/
+
     boolean checkLanguageFile(String dir) {
         File file = new File(dir);
         if(!file.exists() && file.mkdirs())
             createFiles(dir);
         else if(file.exists()){
-            String filePath = dir + "/eng.traineddata"; // 영어
+            String filePath = dir + "/tesseract/eng.traineddata"; // 영어
                                                         // 한글 : /kor.traineddata
             File langDataFile = new File(filePath);
             if(!langDataFile.exists())
@@ -88,9 +146,9 @@ public class TextifyActivity extends AppCompatActivity {
         OutputStream outputStream = null;
 
         try {
-            inputStream = assetMgr.open("eng.traineddata");
+            inputStream = assetMgr.open("tesseract/eng.traineddata");
 
-            String destFile = dir + "/eng.traineddata";
+            String destFile = dir + "/tesseract/eng.traineddata";
 
             outputStream = new FileOutputStream(destFile);
 

@@ -77,10 +77,10 @@ float imgResize(Mat img_src, Mat &img_resize, int resize_width){
     }
 }*/
 
-void detectAndDraw( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
+void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location);
 
-void detectAndDraw( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses ) {
+void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses ) {
 
     Mat output2;
     img.copyTo(output2);

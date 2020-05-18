@@ -5,7 +5,7 @@
 5    android:versionName="4.3.0" >
 6
 7    <uses-sdk
-8        android:minSdkVersion="18"
+8        android:minSdkVersion="26"
 8-->D:\A\teamnova_basic_project\basic_android_second_chance\teamnova_basic_project_android_1st\opencv\java\AndroidManifest.xml
 9        android:targetSdkVersion="29" />
 9-->D:\A\teamnova_basic_project\basic_android_second_chance\teamnova_basic_project_android_1st\opencv\java\AndroidManifest.xml
