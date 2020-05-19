@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.Semaphore;
 
+import static android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 public class FaceDetectionActivity extends AppCompatActivity
@@ -47,19 +48,24 @@ public class FaceDetectionActivity extends AppCompatActivity
 
     private CameraBridgeViewBase openCvCameraView;
 
-    private Button Button_capture, Button_change;
+    private Button Button_capture, Button_change, Button_gallery;
 
     private Mat matInput;
     private Mat matResult;
-    private int cameraType = 0;
+    private int cameraId = 0;
 
     private Uri fileUri;
     private File file;
+    private File mediaStorageDir; // 캡쳐한 이미지가 저장되는 디렉토리
     private String filename;
 
     // Native c++ 메서드
-    /*public native long loadCascade(String cascadeFileName );
-    public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);*/
+    //public native long loadCascade(String cascadeFileName );
+    //public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    public native long LoadCascade(String cascadeFileName );
+    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
+    //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
     public long cascadeClassifier_eye = 0;
@@ -72,6 +78,7 @@ public class FaceDetectionActivity extends AppCompatActivity
     public void releaseWriteLock() {
         writeLock.release();
     }
+
     static {
         System.loadLibrary("opencv_java4");
         System.loadLibrary("native-lib");
@@ -117,10 +124,10 @@ public class FaceDetectionActivity extends AppCompatActivity
         Log.d(TAG, "read_cascade_file:");
 
         // 외부 저장소에서 파일 읽어와 객체 로드
-        //cascadeClassifier_face = loadCascade( "haarcascade_frontalface_alt.xml");
+        cascadeClassifier_face = LoadCascade( "haarcascade_frontalface_alt.xml");
         Log.d(TAG, "read_cascade_file:");
 
-        //cascadeClassifier_eye = loadCascade( "haarcascade_eye_tree_eyeglasses.xml");
+        cascadeClassifier_eye = LoadCascade( "haarcascade_eye_tree_eyeglasses.xml");
     }
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
@@ -152,25 +159,23 @@ public class FaceDetectionActivity extends AppCompatActivity
 
         buttonInit();
 
-        matResult = new Mat();
-
         // xml 파일 읽어와 객체 로드
         read_cascade_file();
 
-        //openCvCameraView = (CameraBridgeViewBase)findViewById(R.id.activity_surface_view);
+        openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
         openCvCameraView.setCvCameraViewListener(this);
-        openCvCameraView.setCameraIndex(1); // front-camera(1), back-camera(0) 후면 카메라 사용
-        cameraType = 1;
+        openCvCameraView.setCameraIndex(CAMERA_FACING_BACK); // 후면 카메라 모드
+        cameraId = CAMERA_FACING_BACK;
 
         //loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
     }
 
     // 전/후면 카메라 전환 메서드
     private void swapCamera() {
-        cameraType = cameraType^1; // 카메라 방향 바꾸기 ==> 기존 camera id에 1 과 비트연산하여 1 / 0 결과 나오게끔
+        cameraId = cameraId^1; // 카메라 방향 바꾸기 ==> 기존 camera id에 1 과 비트연산하여 1 / 0 결과 나오게끔
         openCvCameraView.disableView();
-        openCvCameraView.setCameraIndex(cameraType);
+        openCvCameraView.setCameraIndex(cameraId);
         openCvCameraView.enableView();
     }
 
@@ -178,6 +183,7 @@ public class FaceDetectionActivity extends AppCompatActivity
     private void buttonInit() {
         Button_capture = findViewById(R.id.Button_capture);
         Button_change = findViewById(R.id.Button_change);
+        Button_gallery = findViewById(R.id.Button_gallery);
 
         Button_change.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,9 +192,31 @@ public class FaceDetectionActivity extends AppCompatActivity
             }
         });
 
+        Button_gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 기존 갤러리로 이동하는 intent
+                /*Intent galleryIntent = new Intent(Intent.ACTION_VIEW);
+                galleryIntent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
+                //galleryIntent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivity(galleryIntent);*/
+
+                //pager adapter 사용한 커스텀 갤러리로 이동하는 intent
+                //TODO : 현재 이미지를 볼 수 있으나, 목록 형태가 아닌 이미지 뷰어 형태(무슨 파일들이 있는지 한번에 볼 수 없음)
+                Intent galleryIntent = new Intent(FaceDetectionActivity.this, GoToGalleryActivity.class);
+                startActivity(galleryIntent);
+            }
+        });
+
         Button_capture.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //Log.d(TAG, "capture : before try");
+                /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }*/
 
                 try {
                     Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
@@ -197,18 +225,14 @@ public class FaceDetectionActivity extends AppCompatActivity
                     getWriteLock();
 
                     //Log.d(TAG, "capture : after getWriteLock()");
+                    /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
+                    path.mkdirs();
+                    File file = new File(path, "image.png");
+                    String filename = file.toString();*/
 
                     fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
-                    // TODO : error
-                    // error : java.lang.NullPointerException: Attempt to read from field 'long org.opencv.core.Mat.nativeObj' on a null object reference
-                    // matResult가 초기화되지 않은 상태에서, 호출되었기 때문
-                    // ==> 근본적인 문제 : E/OpenCV/StaticHelper: OpenCV error: Cannot load info library for OpenCV --> 카메라 화면이 뜨지 않음 ( == matResult 가 초기화 되지 않았다는 뜻)
-                    // 버전이 안맞는건가? permission problem 은 아님
-                    Imgproc.cvtColor(matResult, matResult, Imgproc.COLOR_BGR2RGB, 4);
-
-                    // 생성한 file에 matResult를 씌움
-                    boolean ret = Imgcodecs.imwrite( filename, matResult);
+                    boolean ret = Imgcodecs.imwrite( filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
 
                     if ( ret ) {
                         Log.d(TAG, "take picture SUCCESS");
@@ -225,6 +249,7 @@ public class FaceDetectionActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 releaseWriteLock();
+
             }
         });
     }
@@ -320,37 +345,17 @@ public class FaceDetectionActivity extends AppCompatActivity
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        try {
-            //Log.d(TAG, "before getWriteLock()");
+        matInput = inputFrame.rgba();
 
-            getWriteLock();
-
-            //Log.d(TAG, "after getWriteLock()");
-
-            matInput = inputFrame.rgba();
-
-            if ( matResult == null ) {
-                matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
-            }
-
-            // 영상 180도 회전
-            Core.flip(matInput, matInput, 1);
-
-            //Log.d(TAG, "after rotate screen / before detect()");
-
-            //detect(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
-
-            //Log.d(TAG, "after detect()");
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (matResult == null) {
+            matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
         }
 
-        //Log.d(TAG, "before releaseWriteLock()");
+        matResult = matInput;
 
-        releaseWriteLock();
-
-        //Log.d(TAG, "after releaseWriteLock()");
+        DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+        //double scale = 1;
+        //DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
 
         return matResult;
     }

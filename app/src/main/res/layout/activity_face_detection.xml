@@ -128,16 +128,6 @@
         android:background="@drawable/change" />
 
     <Button
-        android:id="@+id/Button_back"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="357dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/left_arrow" />
-
-    <Button
         android:id="@+id/Button_gallery"
         android:layout_width="60dp"
         android:layout_height="60dp"

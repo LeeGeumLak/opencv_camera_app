@@ -79,9 +79,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // Native c++ 메서드
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
-    public native long LoadCascade(String cascadeFileName );
-    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
-    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
+//    public native long LoadCascade(String cascadeFileName );
+//    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+//    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         System.loadLibrary("native-lib");
     }
 
-    private void read_cascade_file(){
+    /*private void read_cascade_file(){
         // Assets에서 파일 가져와 복사
         copyFile("haarcascade_frontalface_alt.xml");
         copyFile("haarcascade_eye_tree_eyeglasses.xml");
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Log.d(TAG, "read_cascade_file:");
 
         cascadeClassifier_eye = LoadCascade( "haarcascade_eye_tree_eyeglasses.xml");
-    }
+    }*/
 
     private void copyFile(String filename) {
         String baseDir = Environment.getExternalStorageDirectory().getPath();
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         buttonInit();
 
         // xml 파일 읽어와 객체 로드
-        read_cascade_file();
+        //read_cascade_file();
 
         // 권한 설정 후, 카메라 실행
         openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);

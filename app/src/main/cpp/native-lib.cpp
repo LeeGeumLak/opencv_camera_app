@@ -209,7 +209,7 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
 }*/
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_Input, jlong mat_addr_Output,
+Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_Input, jlong mat_addr_Output,
                                                                      jlong cascadeClassifier_face, jlong cascadeClassifier_eye, double scale) {
     Mat glasses;
     bool tryflip = false;
@@ -462,7 +462,7 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
 }*/
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_example_lglcamera_activity_MainActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
+Java_com_example_lglcamera_activity_FaceDetectionActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
     const char *nativeFileNameString = env->GetStringUTFChars(cascadeFileName_, 0);
     string baseDir("/storage/emulated/0/");
     baseDir.append(nativeFileNameString);
@@ -485,17 +485,17 @@ Java_com_example_lglcamera_activity_MainActivity_LoadCascade(JNIEnv *env, jobjec
 // face detect and circle
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
+Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
                                                          jlong cascadeClassifier_eye, jlong mat_addr_Input, jlong mat_addr_Result) {
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
 
-    String glassesImage = "sunglasses.png";
+    //String glassesImage = "sunglasses.png";
     //String glassesImage = "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/sunglasses.png";
-    bool tryflip = false;
-    double scale;
-    scale = 1;
-    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
+//    bool tryflip = false;
+//    double scale;
+//    scale = 1;
+//    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
 
     Mat &img_input = *(Mat *) mat_addr_Input;
     Mat &img_result = *(Mat *) mat_addr_Result;
