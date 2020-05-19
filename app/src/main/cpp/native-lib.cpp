@@ -77,10 +77,10 @@ float imgResize(Mat img_src, Mat &img_resize, int resize_width){
     }
 }*/
 
-void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
+//void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location);
 
-void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses ) {
+/*void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses ) {
 
     Mat output2;
     img.copyTo(output2);
@@ -176,7 +176,7 @@ void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifie
             Point center1 = points[0];
             Point center2 = points[1];
 
-            if ( center1.x > center2.x ){
+            if ( center1.x > center2.x ) {
                 Point temp;
                 temp = center1;
                 center1 = center2;
@@ -187,7 +187,7 @@ void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifie
             int width = abs(center2.x - center1.x);
             int height = abs(center2.y - center1.y);
 
-            if ( width > height){
+            if ( width > height) {
 
                 float imgScale = width/330.0;
 
@@ -206,46 +206,169 @@ void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifie
             }
         }
     }
+}*/
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_Input, jlong mat_addr_Output,
+                                                                     jlong cascadeClassifier_face, jlong cascadeClassifier_eye, double scale) {
+    Mat glasses;
+    bool tryflip = false;
+    String glassesName = "sunglasses.png";
+    glasses = imread(glassesName, IMREAD_UNCHANGED);
+
+    Mat &img_input = *(Mat *) mat_addr_Input;
+    Mat &img_output = *(Mat *) mat_addr_Output;
+    img_output = img_input.clone();
+
+    //Mat output2;
+    //img_output.copyTo(output2);
+
+    vector<Rect> faces, faces2;
+    const static Scalar colors[] = {
+            Scalar(255,0,0),
+            Scalar(255,128,0),
+            Scalar(255,255,0),
+            Scalar(0,255,0),
+            Scalar(0,128,255),
+            Scalar(0,255,255),
+            Scalar(0,0,255),
+            Scalar(255,0,255)
+    };
+    Mat gray, smallImg;
+
+    cvtColor( img_output, gray, COLOR_BGR2GRAY );
+    double fx = 1 / scale;
+    resize( gray, smallImg, Size(), fx, fx, INTER_LINEAR_EXACT );
+    equalizeHist( smallImg, smallImg );
+
+    ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( smallImg, faces,
+                                                                      1.1, 2, 0
+                                                                              //|CASCADE_FIND_BIGGEST_OBJECT
+                                                                              //|CASCADE_DO_ROUGH_SEARCH
+                                                                              //|CASCADE_DO_CANNY_PRUNING
+                                                                              |CASCADE_SCALE_IMAGE,
+                                                                      Size(30, 30) );
+
+    Mat result;
+
+    for ( size_t i = 0; i < faces.size(); i++ ) {
+        Rect r = faces[i];
+        Mat smallImgROI;
+        vector<Rect> nestedObjects;
+        Point center;
+        Scalar color = colors[i%8];
+        int radius;
+
+        double aspect_ratio = (double)r.width/r.height;
+
+        if( 0.75 < aspect_ratio && aspect_ratio < 1.3 ) {
+            center.x = cvRound((r.x + r.width*0.5)*scale);
+            center.y = cvRound((r.y + r.height*0.5)*scale);
+            radius = cvRound((r.width + r.height)*0.25*scale);
+            circle( img_output, center, radius, color, 3, 8, 0 );
+        }
+        else {
+            rectangle(img_output, Point(cvRound(r.x * scale), cvRound(r.y * scale)),
+                      Point(cvRound((r.x + r.width - 1) * scale), cvRound((r.y + r.height - 1) * scale)), color, 3, 8, 0);
+        }
+
+        smallImgROI = smallImg( r );
+        ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( smallImgROI, nestedObjects,
+                                                                         1.1, 2, 0
+                                                                                 //|CASCADE_FIND_BIGGEST_OBJECT
+                                                                                 //|CASCADE_DO_ROUGH_SEARCH
+                                                                                 //|CASCADE_DO_CANNY_PRUNING
+                                                                                 |CASCADE_SCALE_IMAGE,
+                                                                         Size(20, 20) );
+
+        cout << nestedObjects.size() << endl;
+
+        vector<Point> points;
+
+        for ( size_t j = 0; j < nestedObjects.size(); j++ ) {
+            Rect nr = nestedObjects[j];
+            center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
+            center.y = cvRound((r.y + nr.y + nr.height*0.5)*scale);
+            radius = cvRound((nr.width + nr.height)*0.25*scale);
+            circle( img_output, center, radius, color, 3, 8, 0 );
+
+            Point p(center.x, center.y);
+            points.push_back(p);
+        }
+
+
+        if ( points.size() == 2){
+
+            Point center1 = points[0];
+            Point center2 = points[1];
+
+            if ( center1.x > center2.x ) {
+                Point temp;
+                temp = center1;
+                center1 = center2;
+                center2 = temp;
+            }
+
+
+            int width = abs(center2.x - center1.x);
+            int height = abs(center2.y - center1.y);
+
+            if ( width > height) {
+
+                float imgScale = width/330.0;
+
+                int w, h;
+                w = glasses.cols * imgScale;
+                h = glasses.rows * imgScale;
+
+                int offsetX = 150 * imgScale;
+                int offsetY = 160 * imgScale;
+
+                Mat resized_glasses;
+                resize( glasses, resized_glasses, Size( w, h), 0, 0 );
+
+                overlayImage(img_output, resized_glasses, result, Point(center1.x-offsetX, center1.y-offsetY));
+                img_output = result;
+            }
+        }
+    }
 }
 
-
-void overlayImage(const Mat &background, const Mat &foreground,
-                  Mat &output, Point2i location)
-{
+void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location) {
     background.copyTo(output);
 
 
     // start at the row indicated by location, or at row 0 if location.y is negative.
-    for (int y = max(location.y, 0); y < background.rows; ++y)
-    {
+    for (int y = max(location.y, 0); y < background.rows; ++y) {
         int fY = y - location.y; // because of the translation
 
         // we are done of we have processed all rows of the foreground image.
-        if (fY >= foreground.rows){
+        if (fY >= foreground.rows) {
             break;
         }
 
         // start at the column indicated by location,
 
         // or at column 0 if location.x is negative.
-        for (int x = max(location.x, 0); x < background.cols; ++x)
-        {
+        for (int x = max(location.x, 0); x < background.cols; ++x) {
             int fX = x - location.x; // because of the translation.
 
             // we are done with this row if the column is outside of the foreground image.
-            if (fX >= foreground.cols){
+            if (fX >= foreground.cols) {
                 break;
             }
 
             // determine the opacity of the foregrond pixel, using its fourth (alpha) channel.
             double opacity =
-                    ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3])/ 255.;
+                    ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3])
+
+                    / 255.;
+
 
             // and now combine the background and foreground pixel, using the opacity,
 
             // but only if opacity > 0.
-            for (int c = 0; opacity > 0 && c < output.channels(); ++c)
-            {
+            for (int c = 0; opacity > 0 && c < output.channels(); ++c) {
                 unsigned char foregroundPx =
                         foreground.data[fY * foreground.step + fX * foreground.channels() + c];
                 unsigned char backgroundPx =
@@ -367,13 +490,12 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
 
-    //String glassesImage = "sunglasses.png";
-    String glassesImage = "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/sunglasses.png";
+    String glassesImage = "sunglasses.png";
+    //String glassesImage = "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/sunglasses.png";
     bool tryflip = false;
     double scale;
     scale = 1;
     Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
-
 
     Mat &img_input = *(Mat *) mat_addr_Input;
     Mat &img_result = *(Mat *) mat_addr_Result;
@@ -382,17 +504,17 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
     Mat output2;
     img_result.copyTo(output2);
 
-
     //---------------------------------------------------------------------------------
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 2);
 
     vector<Rect> faces; // 탐지한 얼굴 정보(위치) 저장
-    Mat img_gray;
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 3);
 
+    Mat img_gray;
     cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
     equalizeHist(img_gray, img_gray);
+
     Mat img_resize;
     float resizeRatio = imgResize(img_gray, img_resize, 640);
 
@@ -411,13 +533,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ", (char *) "face %d found ", faces.size());
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 5);
 
-    Mat result;
-
     // faces.size() 가 0 이상이면 얼굴을 감지한 것으로 간주하여 진행
     for (int i = 0; i < faces.size(); i++) {
-        Rect faces_rect = faces[i];
-        int radius;
-
         // 찾은 얼굴의 x 값과 y 값 계산
         double real_facesize_x = faces[i].x / resizeRatio;
         double real_facesize_y = faces[i].y / resizeRatio;
@@ -426,34 +543,19 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
         double real_facesize_width = faces[i].width / resizeRatio;
         double real_facesize_height = faces[i].height / resizeRatio;
 
-        //Point center( real_facesize_x + real_facesize_width / 2, real_facesize_y + real_facesize_height/2);
-        Point center;
-        double aspect_ratio = (double)faces_rect.width/faces_rect.height;
-
-        if(0.75 < aspect_ratio && aspect_ratio < 1.3) {
-            center.x = cvRound((faces_rect.x + faces_rect.width*0.5)*scale);
-            center.y = cvRound((faces_rect.y + faces_rect.height*0.5)*scale);
-            radius = cvRound((faces_rect.width + faces_rect.height)*0.25*scale);
-            circle(img_result, center, radius, Scalar(255, 192, 0), 3, 8, 0);
-        }
-        else {
-            rectangle(img_result, Point(cvRound(faces_rect.x * scale), cvRound(faces_rect.y * scale)),
-                    Point(cvRound((faces_rect.x + faces_rect.width - 1) * scale), cvRound((faces_rect.y + faces_rect.height - 1) * scale)),
-                    Scalar(255, 192, 0), 3, 8, 0);
-        }
+        Point center( real_facesize_x + real_facesize_width / 2, real_facesize_y + real_facesize_height/2);
 
         // ellipse() : 타원 그리기 함수
         // img_result = 원이 그려질 이미지
         // center = 원의 중심 좌표
         // Size = 원의 반지름
         // Scalar = 원의 색깔 BRG 순서 이 부분에서는 분홍색 원을 그려준다
-        //ellipse(img_result, center, Size( real_facesize_width / 2, real_facesize_height / 2), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
+        ellipse(img_result, center, Size( real_facesize_width / 2, real_facesize_height / 2), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
 
         // Rect 구조체 : 사각형의 너비, 높이, 위치를 지정
-        //Rect face_area(real_facesize_x, real_facesize_y, real_facesize_width,real_facesize_height);
+        Rect face_area(real_facesize_x, real_facesize_y, real_facesize_width,real_facesize_height);
 
-        //Mat faceROI = img_gray( face_area );
-        Mat faceROI = img_resize(faces_rect);
+        Mat faceROI = img_gray( face_area );
 
         vector<Rect> eyes; // 탐지한 눈의 정보(위치) 저장
 
@@ -466,29 +568,19 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
                                                                                  |CASCADE_SCALE_IMAGE,
                                                                          Size(15, 15) );
 
-        vector<Point> points;
-
         // eyes.size() : 검출한 눈의 개수
         for ( size_t j = 0; j < eyes.size(); j++ ) {
-            //Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
+            Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
 
-            Rect eyes_rect = eyes[j];
-            center.x  = cvRound((faces_rect.x + eyes_rect.x + eyes_rect.width*0.5)*scale);
-            center.y  = cvRound((faces_rect.y + eyes_rect.y + eyes_rect.height*0.5)*scale);
-            radius = cvRound((eyes_rect.width + eyes_rect.height)*0.25*scale);
-
-            //radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+            int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
 
             // 눈이 인식되면 원을 그리는 부분
             // img_result = 원이 그려질 이미지
             // eye_center = 원의 중심 좌표
             // radius = 원의 반지름
             // Scalar = 원의 색깔 BRG 순서 이 부분에서는 빨간색 원을 그려준다
-            //circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
-            circle( img_result, center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
+            circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
 
-            Point p(center.x, center.y);
-            points.push_back(p);
             /*Mat &img_input = *(Mat *) mat_addr_Input;
             Mat &img_result = *(Mat *) mat_addr_Result;
 
@@ -506,38 +598,6 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
             nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
 
             detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
-        }
-
-        if(points.size() == 2) {
-            Point center1 = points[0];
-            Point center2 = points[1];
-
-            if(center1.x > center2.x) {
-                Point temp;
-                temp = center1;
-                center1 = center2;
-                center2 = temp;
-            }
-
-            int width = abs(center2.x - center1.x);
-            int height = abs(center2.y - center1.y);
-
-            if(width > height) {
-                float imgScale = width/330.0;
-
-                int w, h;
-                w = glasses.cols * imgScale;
-                h = glasses.rows * imgScale;
-
-                int offsetX = 150 * imgScale;
-                int offsetY = 160 * imgScale;
-
-                Mat resized_glasses;
-                resize(glasses, resized_glasses, Size(w, h), 0, 0);
-
-                overlayImage(output2, resized_glasses, result, Point(center1.x - offsetX, center1.y-offsetY));
-                output2 = result;
-            }
         }
     }
 

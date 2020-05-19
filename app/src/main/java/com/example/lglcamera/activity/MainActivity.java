@@ -6,6 +6,7 @@ import androidx.core.content.FileProvider;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.media.FaceDetector;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
@@ -256,10 +257,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_sticker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RGBA = 0;
+                /*RGBA = 0;
                 GrayScale = 0;
                 HSV  = 0;
-                sticker = 1;
+                sticker = 1;*/
+                Intent faceDetectionIntent = new Intent(MainActivity.this, FaceDetectionActivity.class);
             }
         });
 
@@ -508,9 +510,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
         if(sticker == 1) {
             //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
-            double scale = 1;
-
-            DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
+            //double scale = 1;
+            //DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
         }
 
         return matResult;
