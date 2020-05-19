@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
     public native long LoadCascade(String cascadeFileName );
     public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
+    //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
     public long cascadeClassifier_eye = 0;
@@ -505,8 +507,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }
         if(sticker == 1) {
-            DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(),
-                    matResult.getNativeObjAddr());
+            //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+            double scale = 1;
+
+            DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
         }
 
         return matResult;

@@ -8,13 +8,103 @@
     tools:context=".activity.FaceDetectionActivity"
     tools:ignore="MissingDefaultResource">
 
-    <!--<org.opencv.android.JavaCameraView
-        android:id="@+id/activity_surface_view"
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="70dp"
         android:layout_marginEnd="100dp"
-        android:visibility="gone" />
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/Button_Sticker"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="570dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="100dp"
+        android:background="#7d010000"
+        android:text="Sticker"
+        android:textColor="#ffffff"
+        android:textSize="13dp"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/Button_HSV"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_Gray"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="566dp"
+        android:layout_marginTop="310dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="104dp"
+        android:background="#7d010000 "
+        android:text="HSV"
+        android:textColor="#ffffff"
+        android:textSize="13dp"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/Button_Gray"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_RGB"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="570dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="100dp"
+        android:background="#7d010000"
+        android:text="Gray"
+        android:textColor="#ffffff"
+        android:textSize="13dp"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/Button_RGB"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_Text"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="570dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="100dp"
+        android:background="#7d010000"
+        android:text="RGB"
+        android:textColor="#ffffff"
+        android:textSize="13dp"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/Button_Text"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_Sticker"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="570dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="100dp"
+        android:background="#7d010000"
+        android:text="Text"
+        android:textColor="#ffffff"
+        android:textSize="13dp"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/Button_capture"
@@ -23,41 +113,29 @@
         android:layout_alignParentEnd="true"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginTop="180dp"
-        android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
         android:background="@drawable/camera_ok" />
 
     <Button
         android:id="@+id/Button_change"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_marginStart="10dp"
         android:layout_marginTop="7dp"
-        android:layout_marginEnd="671dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/change" />
 
     <Button
-        android:id="@+id/Button_option"
+        android:id="@+id/Button_webRtc"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
         android:layout_marginStart="10dp"
         android:layout_marginTop="357dp"
-        android:layout_marginEnd="686dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/option" />
+        android:background="@drawable/video_camera" />
 
     <Button
         android:id="@+id/Button_gallery"
@@ -68,6 +146,17 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/gallery" />-->
+        android:background="@drawable/gallery" />
+
+    <Button
+        android:id="@+id/Button_filter"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="300dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/filter_change" />
 
 </RelativeLayout>
