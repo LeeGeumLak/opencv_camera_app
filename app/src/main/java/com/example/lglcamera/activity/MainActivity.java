@@ -262,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 HSV  = 0;
                 sticker = 1;*/
                 Intent faceDetectionIntent = new Intent(MainActivity.this, FaceDetectionActivity.class);
+                startActivity(faceDetectionIntent);
             }
         });
 
