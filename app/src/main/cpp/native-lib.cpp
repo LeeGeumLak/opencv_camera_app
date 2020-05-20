@@ -207,21 +207,22 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
         }
     }
 }*/
+// Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_Input, jlong mat_addr_Output,
-                                                                     jlong cascadeClassifier_face, jlong cascadeClassifier_eye, double scale) {
-    Mat glasses;
+Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_input,
+                                                                     jlong cascadeClassifier_face, jlong cascadeClassifier_eye) {
     bool tryflip = false;
+    double scale = 1;
+
+    Mat glasses;
     String glassesName = "sunglasses.png";
     glasses = imread(glassesName, IMREAD_UNCHANGED);
 
-    Mat &img_input = *(Mat *) mat_addr_Input;
-    Mat &img_output = *(Mat *) mat_addr_Output;
-    img_output = img_input.clone();
+    Mat &img_input = *(Mat *) mat_addr_input;
 
-    //Mat output2;
-    //img_output.copyTo(output2);
+    Mat output2;
+    img_input.copyTo(output2);
 
     vector<Rect> faces, faces2;
     const static Scalar colors[] = {
@@ -236,7 +237,7 @@ Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndSunglasses(JN
     };
     Mat gray, smallImg;
 
-    cvtColor( img_output, gray, COLOR_BGR2GRAY );
+    cvtColor( img_input, gray, COLOR_BGR2GRAY );
     double fx = 1 / scale;
     resize( gray, smallImg, Size(), fx, fx, INTER_LINEAR_EXACT );
     equalizeHist( smallImg, smallImg );
@@ -265,10 +266,10 @@ Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndSunglasses(JN
             center.x = cvRound((r.x + r.width*0.5)*scale);
             center.y = cvRound((r.y + r.height*0.5)*scale);
             radius = cvRound((r.width + r.height)*0.25*scale);
-            circle( img_output, center, radius, color, 3, 8, 0 );
+            circle( img_input, center, radius, color, 3, 8, 0 );
         }
         else {
-            rectangle(img_output, Point(cvRound(r.x * scale), cvRound(r.y * scale)),
+            rectangle(img_input, Point(cvRound(r.x * scale), cvRound(r.y * scale)),
                       Point(cvRound((r.x + r.width - 1) * scale), cvRound((r.y + r.height - 1) * scale)), color, 3, 8, 0);
         }
 
@@ -290,7 +291,7 @@ Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndSunglasses(JN
             center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
             center.y = cvRound((r.y + nr.y + nr.height*0.5)*scale);
             radius = cvRound((nr.width + nr.height)*0.25*scale);
-            circle( img_output, center, radius, color, 3, 8, 0 );
+            circle( img_input, center, radius, color, 3, 8, 0 );
 
             Point p(center.x, center.y);
             points.push_back(p);
@@ -327,8 +328,8 @@ Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndSunglasses(JN
                 Mat resized_glasses;
                 resize( glasses, resized_glasses, Size( w, h), 0, 0 );
 
-                overlayImage(img_output, resized_glasses, result, Point(center1.x-offsetX, center1.y-offsetY));
-                img_output = result;
+                overlayImage(img_input, resized_glasses, result, Point(center1.x-offsetX, center1.y-offsetY));
+                img_input = result;
             }
         }
     }
