@@ -76,11 +76,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private final long FINISH_INTERVAL_TIME = 2000;
     private long   backPressedTime = 0;
 
+    // 얼굴 인식 이벤트 설정
+    private int RequestPreviewImg = 1234;
+    private boolean ret = false;
+
     // Native c++ 메서드
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
-//    public native long LoadCascade(String cascadeFileName );
-//    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    public native long LoadCascade(String cascadeFileName );
+    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
 //    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
@@ -101,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         System.loadLibrary("native-lib");
     }
 
-    /*private void read_cascade_file(){
+    private void read_cascade_file(){
         // Assets에서 파일 가져와 복사
         copyFile("haarcascade_frontalface_alt.xml");
         copyFile("haarcascade_eye_tree_eyeglasses.xml");
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Log.d(TAG, "read_cascade_file:");
 
         cascadeClassifier_eye = LoadCascade( "haarcascade_eye_tree_eyeglasses.xml");
-    }*/
+    }
 
     private void copyFile(String filename) {
         String baseDir = Environment.getExternalStorageDirectory().getPath();
@@ -182,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         buttonInit();
 
         // xml 파일 읽어와 객체 로드
-        //read_cascade_file();
+        read_cascade_file();
 
         // 권한 설정 후, 카메라 실행
         openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
@@ -257,12 +261,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_sticker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*RGBA = 0;
+                RGBA = 0;
                 GrayScale = 0;
                 HSV  = 0;
-                sticker = 1;*/
-                Intent faceDetectionIntent = new Intent(MainActivity.this, FaceDetectionActivity.class);
-                startActivity(faceDetectionIntent);
+                sticker = 1;
+
+                /*Intent faceDetectionIntent = new Intent(MainActivity.this, FaceDetectionActivity.class);
+                startActivity(faceDetectionIntent);*/
             }
         });
 
@@ -312,38 +317,79 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }*/
 
-                try {
-                    Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
-                    //Log.d(TAG, "capture : after try");
+                if(sticker == 1) {
+                    try {
+                        //Log.d(TAG, "capture : after try");
 
-                    getWriteLock();
+                        Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
 
-                    //Log.d(TAG, "capture : after getWriteLock()");
+                        getWriteLock();
+
+                        //Log.d(TAG, "capture : after getWriteLock()");
+                        /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
+                        path.mkdirs();
+                        File file = new File(path, "image.png");
+                     String filename = file.toString();*/
+
+                        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
+
+                        Imgcodecs.imwrite( filename, matInput); // 위 생성한 파일에 현재 카메라 화면 씌움(얼굴 인식하여 동그라미로 표시된 것은 X)
+
+                        // 씌운 파일을 이미지 프리뷰 액티비티로 putExtra하여 인텐트 이동
+                        Intent previewImgIntent = new Intent(MainActivity.this, PhotoPreviewActivity.class);
+                        previewImgIntent.putExtra("filename", filename);
+                        startActivityForResult(previewImgIntent, RequestPreviewImg);
+
+                        // ForResult 로 받아온 ret 값에 따라서 사진 저장 성공/실패 여부
+                        if ( ret ) {
+                            Log.d(TAG, "take picture SUCCESS");
+
+                            Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                            mediaScanIntent.setData(Uri.fromFile(file));
+                            sendBroadcast(mediaScanIntent);
+                        }
+                        else {
+                            Log.d(TAG, "take picture FAIL");
+                        }
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    releaseWriteLock();
+
+                }
+                else {
+                    try {
+                        Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+                        //Log.d(TAG, "capture : after try");
+
+                        getWriteLock();
+
+                        //Log.d(TAG, "capture : after getWriteLock()");
                     /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
                     path.mkdirs();
                     File file = new File(path, "image.png");
                     String filename = file.toString();*/
 
-                    fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
+                        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
-                    boolean ret = Imgcodecs.imwrite( filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
+                        boolean ret = Imgcodecs.imwrite(filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
 
-                    if ( ret ) {
-                        Log.d(TAG, "take picture SUCCESS");
+                        if (ret) {
+                            Log.d(TAG, "take picture SUCCESS");
+                        } else {
+                            Log.d(TAG, "take picture FAIL");
+                        }
+
+                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        mediaScanIntent.setData(Uri.fromFile(file));
+                        sendBroadcast(mediaScanIntent);
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    else {
-                        Log.d(TAG, "take picture FAIL");
-                    }
-
-                    Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    mediaScanIntent.setData(Uri.fromFile(file));
-                    sendBroadcast(mediaScanIntent);
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    releaseWriteLock();
                 }
-                releaseWriteLock();
-
             }
         });
 
@@ -447,6 +493,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             backPressedTime = tempTime;
             Toast.makeText(getApplicationContext(), "뒤로가기 버튼을 한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     @Override
@@ -510,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }
         if(sticker == 1) {
-            //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+            DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
             //double scale = 1;
             //DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
         }

@@ -68,8 +68,8 @@ public class FaceDetectionActivity extends AppCompatActivity
     // Native c++ 메서드
     //public native long loadCascade(String cascadeFileName );
     //public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
-    public native long LoadCascade(String cascadeFileName );
-    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    //public native long LoadCascade(String cascadeFileName );
+    //public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
     //public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
@@ -122,7 +122,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         }
     }
 
-    private void read_cascade_file(){
+    /*private void read_cascade_file(){
         // Assets에서 파일 가져와 복사
         copyFile("haarcascade_frontalface_alt.xml");
         copyFile("haarcascade_eye_tree_eyeglasses.xml");
@@ -134,7 +134,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         Log.d(TAG, "read_cascade_file:");
 
         cascadeClassifier_eye = LoadCascade( "haarcascade_eye_tree_eyeglasses.xml");
-    }
+    }*/
 
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -166,7 +166,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         buttonInit();
 
         // xml 파일 읽어와 객체 로드
-        read_cascade_file();
+        //read_cascade_file();
 
         openCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         openCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -378,7 +378,7 @@ public class FaceDetectionActivity extends AppCompatActivity
 
         matResult = matInput;
 
-        DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+        //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         //double scale = 1;
         //DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
 

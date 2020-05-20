@@ -565,7 +565,7 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
 }*/
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_example_lglcamera_activity_FaceDetectionActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
+Java_com_example_lglcamera_activity_MainActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
     const char *nativeFileNameString = env->GetStringUTFChars(cascadeFileName_, 0);
     string baseDir("/storage/emulated/0/");
     baseDir.append(nativeFileNameString);
@@ -588,7 +588,7 @@ Java_com_example_lglcamera_activity_FaceDetectionActivity_LoadCascade(JNIEnv *en
 // face detect and circle
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_activity_FaceDetectionActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
+Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
                                                          jlong cascadeClassifier_eye, jlong mat_addr_Input, jlong mat_addr_Result) {
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
