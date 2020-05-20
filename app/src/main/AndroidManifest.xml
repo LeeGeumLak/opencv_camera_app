@@ -49,7 +49,12 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.PhotoPreviewActivity"></activity>
+        <activity
+            android:name=".activity.PhotoPreviewActivity"
+            android:screenOrientation="landscape"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
+
         <activity
             android:name=".SettingsActivity"
             android:label="@string/settings_name"></activity>

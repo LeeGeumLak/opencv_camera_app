@@ -1,12 +1,14 @@
 package com.example.lglcamera.activity;
 
 //기본 패키지
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -28,6 +30,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.photo.Photo;
 
 //자바 패키지
 import java.io.File;
@@ -57,14 +60,17 @@ public class FaceDetectionActivity extends AppCompatActivity
     private Uri fileUri;
     private File file;
     private File mediaStorageDir; // 캡쳐한 이미지가 저장되는 디렉토리
-    private String filename;
+    private String fileName;
+
+    private int RequestPreviewImg = 1234;
+    private boolean ret = false;
 
     // Native c++ 메서드
     //public native long loadCascade(String cascadeFileName );
     //public native void detect(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
     public native long LoadCascade(String cascadeFileName );
     public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
-    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
+    //public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
@@ -219,8 +225,9 @@ public class FaceDetectionActivity extends AppCompatActivity
                 }*/
 
                 try {
-                    Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
                     //Log.d(TAG, "capture : after try");
+
+                    Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
 
                     getWriteLock();
 
@@ -232,18 +239,24 @@ public class FaceDetectionActivity extends AppCompatActivity
 
                     fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
-                    boolean ret = Imgcodecs.imwrite( filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
+                    Imgcodecs.imwrite( fileName, matInput); // 위 생성한 파일에 현재 카메라 화면 씌움(얼굴 인식하여 동그라미로 표시된 것은 X)
 
+                    // 씌운 파일을 이미지 프리뷰 액티비티로 putExtra하여 인텐트 이동
+                    Intent previewImgIntent = new Intent(FaceDetectionActivity.this, PhotoPreviewActivity.class);
+                    previewImgIntent.putExtra("filename", fileName);
+                    startActivityForResult(previewImgIntent, RequestPreviewImg);
+
+                    // ForResult 로 받아온 ret 값에 따라서 사진 저장 성공/실패 여부
                     if ( ret ) {
                         Log.d(TAG, "take picture SUCCESS");
+
+                        Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        mediaScanIntent.setData(Uri.fromFile(file));
+                        sendBroadcast(mediaScanIntent);
                     }
                     else {
                         Log.d(TAG, "take picture FAIL");
                     }
-
-                    Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    mediaScanIntent.setData(Uri.fromFile(file));
-                    sendBroadcast(mediaScanIntent);
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -252,6 +265,18 @@ public class FaceDetectionActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RequestPreviewImg) {
+            String ret_str = data.getStringExtra("isSave");
+
+            if(ret_str.equals("yes")) ret = true;
+            else if(ret_str.equals("no")) ret = false;
+        }
     }
 
     private Uri getOutputMediaFileUri(int type){
@@ -283,7 +308,7 @@ public class FaceDetectionActivity extends AppCompatActivity
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_"+ timeStamp + ".jpg");
-            filename = mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg";
+            fileName = mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg";
         } else {
             return null;
         }
@@ -292,15 +317,15 @@ public class FaceDetectionActivity extends AppCompatActivity
         if(!file.exists()) {
             try {
                 file.createNewFile();
-                Toast.makeText(getApplicationContext(), "successed to create " + filename, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "successed to create " + fileName, Toast.LENGTH_SHORT).show();
 
             }
             catch(IOException e) {
-                Toast.makeText(getApplicationContext(), "failed to create " + filename, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "failed to create " + fileName, Toast.LENGTH_SHORT).show();
             }
         }
         else {
-            Toast.makeText(getApplicationContext(), filename + " is already exists", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), fileName + " is already exists", Toast.LENGTH_SHORT).show();
         }
 
         return mediaFile;

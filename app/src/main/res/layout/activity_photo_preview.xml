@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/preview_img"
-        android:layout_width="374dp"
-        android:layout_height="602dp"
+        android:layout_width="580dp"
+        android:layout_height="380dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,18 +22,21 @@
         android:id="@+id/button_no"
         android:layout_width="110dp"
         android:layout_height="80dp"
+        android:layout_marginEnd="16dp"
         android:text="취소"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="255dp"
-        tools:layout_editor_absoluteY="631dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="316dp"
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/button_yes"
         android:layout_width="110dp"
         android:layout_height="80dp"
-        android:layout_marginBottom="20dp"
-        android:text="확인"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="312dp"
+        android:text="저장"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="MissingConstraints" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
