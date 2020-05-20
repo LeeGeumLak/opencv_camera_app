@@ -4,6 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".activity.PhotoPreviewActivity">
 
+
+    <ImageView
+        android:id="@+id/preview_img"
+        android:layout_width="374dp"
+        android:layout_height="602dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/sym_def_app_icon" />
+
+    <Button
+        android:id="@+id/button_no"
+        android:layout_width="110dp"
+        android:layout_height="80dp"
+        android:text="취소"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="255dp"
+        tools:layout_editor_absoluteY="631dp" />
+
+    <Button
+        android:id="@+id/button_yes"
+        android:layout_width="110dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="20dp"
+        android:text="확인"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="40dp"
+        tools:ignore="MissingConstraints" />
 </androidx.constraintlayout.widget.ConstraintLayout>
