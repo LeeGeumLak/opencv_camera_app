@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.lglcamera"
-        minSdkVersion 26
+        minSdkVersion 18
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -100,9 +100,12 @@ dependencies {
     //implementation files('libs/audio_device_java.jar')
     //implementation files('libs/libjingle_peerconnection.jar')
 
-    compile files('libs/audio_device_java__compile_java.javac.jar')
-    compile files('libs/autobanh.jar')
-    compile files('libs/base_java.jar')
-    compile files('libs/libjingle_peerconnection_java.jar')
+//    compile files('libs/audio_device_java__compile_java.javac.jar')
+//    compile files('libs/autobanh.jar')
+//    compile files('libs/base_java.jar')
+//    compile files('libs/libjingle_peerconnection_java.jar')
 
+    //webRTC
+    implementation 'org.webrtc:google-webrtc:1.0.+'
+    implementation files('libs/autobanh.jar')
 }
