@@ -20,12 +20,14 @@ import android.widget.Toast;
 import com.example.lglcamera.R;
 
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 
 import static org.opencv.core.Core.findFileOrKeep;
@@ -41,9 +43,11 @@ public class PhotoPreviewActivity extends AppCompatActivity {
 
     private String fileName;
     Mat fileImg;
+    private File file;
+    private boolean ret;
 
     public native long LoadCascade(String cascadeFileName );
-    public native void DetectAndSunglasses(long mat_addr_input, long cascadeClassifier_face, long cascadeClassifier_eye);
+    //public native void DetectAndSunglasses(long mat_addr_input, long cascadeClassifier_face, long cascadeClassifier_eye);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
@@ -109,7 +113,11 @@ public class PhotoPreviewActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        Log.e(TAG, "init 들어가기 전");
+
         init();
+
+        Log.e(TAG, "init 들어갔다 나옴");
 
         // xml 파일 읽어와 객체 로드
         read_cascade_file();
@@ -134,26 +142,6 @@ public class PhotoPreviewActivity extends AppCompatActivity {
                 isCancel();
             }
         });
-
-        // FaceDetectionActivity로 부터 받은 이미지에 선글라스 이미지 씌우기
-        if (!fileName.isEmpty())
-        {
-            fileImg = imread(findFileOrKeep(fileName), IMREAD_COLOR);
-
-            DetectAndSunglasses( fileImg.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
-
-            //선글라스를 씌운 이미지를 fileName 파일에 씌움
-            Imgcodecs.imwrite( fileName, fileImg);
-
-        }
-
-        // setImageURI - Uri 경로에 따른 SDCard에 있는 이미지 파일을 로드하고, 이미지뷰 설정
-        try {
-            Uri uri = Uri.parse("file:///" + fileName);
-            preview_img.setImageURI(uri);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -165,9 +153,47 @@ public class PhotoPreviewActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        Log.e(TAG, "onResume 들어옴");
+
         Intent intent = getIntent();
+
         if(intent != null) {
-            fileName = intent.getStringExtra("filename");
+            Log.e(TAG, "getIntent 해서 null 이 아닐때");
+
+            long addr = intent.getLongExtra("matInput", 0);
+            Mat mat = new Mat(addr);
+            fileImg = mat;
+
+            Log.e(TAG, "fileImg 받아옴");
+
+
+            //file = new File(intent.getStringExtra("file"));
+            //file = (File)intent.getExtras().get("file");
+
+            //Log.e(TAG, "file 받아옴");
+
+            //Log.e(TAG, "선글라스 들어가기 전");
+            // TODO : 에러 발생 지점 : DetectAndSunglasses 안에 'cvt 직전' 이후
+
+            //DetectAndSunglasses( fileImg.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
+
+            //Log.e(TAG, "선글라스 들어가고 나온 후");
+
+            //선글라스를 씌운 이미지를 fileName 파일에 씌움
+            //ret = Imgcodecs.imwrite( fileName, fileImg);
+
+            Log.e(TAG, "선글라스 이미지 씌운 후");
+
+            // setImageURI - Uri 경로에 따른 SDCard에 있는 이미지 파일을 로드하고, 이미지뷰 설정
+//            try {
+////            Uri uri = Uri.parse("file:///" + fileName);
+//                Uri uri = Uri.parse(fileName);
+//                preview_img.setImageURI(uri);
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+
+            Log.e(TAG, "이미지 뷰 설정후");
         }
     }
 
@@ -199,6 +225,17 @@ public class PhotoPreviewActivity extends AppCompatActivity {
         builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                if ( ret ) {
+                    Log.d(TAG, "take picture SUCCESS");
+
+                    //Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    //mediaScanIntent.setData(Uri.fromFile(file));
+                    //sendBroadcast(mediaScanIntent);
+                }
+                else {
+                    Log.d(TAG, "take picture FAIL");
+                }
+
                 finish();
                 Intent faceDetectionIntent = new Intent(PhotoPreviewActivity.this, FaceDetectionActivity.class);
                 faceDetectionIntent.putExtra("isSave", "yes");

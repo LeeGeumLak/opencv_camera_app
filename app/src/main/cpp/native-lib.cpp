@@ -210,14 +210,18 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
 // Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_activity_PhotoPreviewActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_input,
+Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_input,
                                                                      jlong cascadeClassifier_face, jlong cascadeClassifier_eye) {
     bool tryflip = false;
     double scale = 1;
 
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","선글라스 들어 옴 %d", 1);
+
     Mat glasses;
     String glassesName = "sunglasses.png";
     glasses = imread(glassesName, IMREAD_UNCHANGED);
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","선글라스 이미지 받아옴 %d", 1);
 
     Mat &img_input = *(Mat *) mat_addr_input;
 
@@ -235,11 +239,17 @@ Java_com_example_lglcamera_activity_PhotoPreviewActivity_DetectAndSunglasses(JNI
             Scalar(0,0,255),
             Scalar(255,0,255)
     };
-    Mat gray, smallImg;
 
-    cvtColor( img_input, gray, COLOR_BGR2GRAY );
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","cvt 직전 %d", 1);
+
+    Mat img_gray;
+    cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","cvt 직후 %d", 1);
+
+    Mat smallImg;
     double fx = 1 / scale;
-    resize( gray, smallImg, Size(), fx, fx, INTER_LINEAR_EXACT );
+    resize( img_gray, smallImg, Size(), fx, fx, INTER_LINEAR_EXACT );
     equalizeHist( smallImg, smallImg );
 
     ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( smallImg, faces,
@@ -255,7 +265,7 @@ Java_com_example_lglcamera_activity_PhotoPreviewActivity_DetectAndSunglasses(JNI
     for ( size_t i = 0; i < faces.size(); i++ ) {
         Rect r = faces[i];
         Mat smallImgROI;
-        vector<Rect> nestedObjects;
+        vector<Rect> eyes;
         Point center;
         Scalar color = colors[i%8];
         int radius;
@@ -274,7 +284,7 @@ Java_com_example_lglcamera_activity_PhotoPreviewActivity_DetectAndSunglasses(JNI
         }
 
         smallImgROI = smallImg( r );
-        ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( smallImgROI, nestedObjects,
+        ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( smallImgROI, eyes,
                                                                          1.1, 2, 0
                                                                                  //|CASCADE_FIND_BIGGEST_OBJECT
                                                                                  //|CASCADE_DO_ROUGH_SEARCH
@@ -282,12 +292,12 @@ Java_com_example_lglcamera_activity_PhotoPreviewActivity_DetectAndSunglasses(JNI
                                                                                  |CASCADE_SCALE_IMAGE,
                                                                          Size(20, 20) );
 
-        cout << nestedObjects.size() << endl;
+        //cout << eyes.size() << endl;
 
         vector<Point> points;
 
-        for ( size_t j = 0; j < nestedObjects.size(); j++ ) {
-            Rect nr = nestedObjects[j];
+        for ( size_t j = 0; j < eyes.size(); j++ ) {
+            Rect nr = eyes[j];
             center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
             center.y = cvRound((r.y + nr.y + nr.height*0.5)*scale);
             radius = cvRound((nr.width + nr.height)*0.25*scale);
@@ -328,11 +338,17 @@ Java_com_example_lglcamera_activity_PhotoPreviewActivity_DetectAndSunglasses(JNI
                 Mat resized_glasses;
                 resize( glasses, resized_glasses, Size( w, h), 0, 0 );
 
-                overlayImage(img_input, resized_glasses, result, Point(center1.x-offsetX, center1.y-offsetY));
-                img_input = result;
+                __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직전 %d", 1);
+
+                overlayImage(output2, resized_glasses, result, Point(center1.x-offsetX, center1.y-offsetY));
+
+                __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직후 %d", 1);
+
+                output2 = result;
             }
         }
     }
+    output2.copyTo(img_input);
 }
 
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location) {

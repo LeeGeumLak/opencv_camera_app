@@ -1,4 +1,5 @@
 package com.example.lglcamera.activity;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -13,6 +14,7 @@ import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
     public native long LoadCascade(String cascadeFileName );
     public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
-//    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_output, long cascadeClassifier_face, long cascadeClassifier_eye, double scale);
+    public native void DetectAndSunglasses(long mat_addr_input, long cascadeClassifier_face, long cascadeClassifier_eye);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
@@ -317,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }*/
 
+                // 스티커 모드일때, 사진 캡쳐시
                 if(sticker == 1) {
                     try {
                         //Log.d(TAG, "capture : after try");
@@ -333,13 +336,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                         fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
-                        Imgcodecs.imwrite( filename, matInput); // 위 생성한 파일에 현재 카메라 화면 씌움(얼굴 인식하여 동그라미로 표시된 것은 X)
+                        DetectAndSunglasses( matInput.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
+
+                        ret = Imgcodecs.imwrite( filename, matInput); // 위 생성한 파일에 현재 카메라 화면 씌움(얼굴 인식하여 동그라미로 표시된 것은 X)
 
                         // 씌운 파일을 이미지 프리뷰 액티비티로 putExtra하여 인텐트 이동
-                        Intent previewImgIntent = new Intent(MainActivity.this, PhotoPreviewActivity.class);
-                        previewImgIntent.putExtra("filename", filename);
-                        startActivityForResult(previewImgIntent, RequestPreviewImg);
 
+                        /*long addr = matInput.getNativeObjAddr();
+                        Intent previewImgIntent = new Intent(MainActivity.this, PhotoPreviewActivity.class);
+                        previewImgIntent.putExtra("matInput", addr);
+                        //previewImgIntent.putExtra("file", file);
+
+                        startActivityForResult(previewImgIntent, RequestPreviewImg);
+*/
                         // ForResult 로 받아온 ret 값에 따라서 사진 저장 성공/실패 여부
                         if ( ret ) {
                             Log.d(TAG, "take picture SUCCESS");
@@ -358,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     releaseWriteLock();
 
                 }
+                // 스티커 모드가 아닐때, 사진 캡쳐시
                 else {
                     try {
                         Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
@@ -373,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                         fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
-                        boolean ret = Imgcodecs.imwrite(filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
+                        ret = Imgcodecs.imwrite(filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
 
                         if (ret) {
                             Log.d(TAG, "take picture SUCCESS");
@@ -397,6 +407,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         btnOpen = AnimationUtils.loadAnimation(this, R.anim.btn_open);
         btnClose = AnimationUtils.loadAnimation(this, R.anim.btn_close);
     }
+
+    /*@Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RequestPreviewImg) {
+            String ret_str = data.getStringExtra("isSave");
+
+            if(ret_str.equals("yes")) ret = true;
+            else if(ret_str.equals("no")) ret = false;
+        }
+    }*/
 
     // 필터 버튼 클릭시, 애니메이션 이벤트
     private void toggleBtn() {
