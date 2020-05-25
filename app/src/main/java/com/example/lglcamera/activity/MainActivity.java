@@ -581,11 +581,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }
         if(sticker == 1) {
-            DetectAndSunglasses( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
-
+            // 얼굴 검출
             //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
-            //double scale = 1;
-            //DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
+
+            // 얼굴 검출 후, 선글라스 씌우기
+            DetectAndSunglasses( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
         }
 
 

@@ -46,7 +46,7 @@ public class PhotoPreviewActivity extends AppCompatActivity {
     private File file;
     private boolean ret;
 
-    public native long LoadCascade(String cascadeFileName );
+    //public native long LoadCascade(String cascadeFileName );
     //public native void DetectAndSunglasses(long mat_addr_input, long cascadeClassifier_face, long cascadeClassifier_eye);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
@@ -90,7 +90,7 @@ public class PhotoPreviewActivity extends AppCompatActivity {
         }
     }
 
-    private void read_cascade_file(){
+    /*private void read_cascade_file(){
         // Assets에서 파일 가져와 복사
         copyFile("haarcascade_frontalface_alt.xml");
         copyFile("haarcascade_eye_tree_eyeglasses.xml");
@@ -102,7 +102,8 @@ public class PhotoPreviewActivity extends AppCompatActivity {
         Log.d(TAG, "read_cascade_file:");
 
         cascadeClassifier_eye = LoadCascade( "haarcascade_eye_tree_eyeglasses.xml");
-    }
+    }*/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,7 +121,7 @@ public class PhotoPreviewActivity extends AppCompatActivity {
         Log.e(TAG, "init 들어갔다 나옴");
 
         // xml 파일 읽어와 객체 로드
-        read_cascade_file();
+        //read_cascade_file();
     }
 
     // 버튼 및 이미지뷰 초기화

@@ -57,14 +57,11 @@
         <activity
             android:name=".activity.PhotoPreviewActivity"
             android:screenOrientation="landscape"
-            tools:ignore="LockedOrientationActivity">
-        </activity>
+            tools:ignore="LockedOrientationActivity"/>
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings_name">
-
-        </activity>
+            android:label="@string/settings_name"/>
 
         <activity
             android:name=".ConnectActivity"
@@ -86,8 +83,7 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:screenOrientation="fullUser"
-            android:theme="@style/CallActivityTheme">
-        </activity>
+            android:theme="@style/CallActivityTheme"/>
 
         <activity android:name=".activity.GoToGalleryActivity" />
 
@@ -95,6 +91,7 @@
             android:name=".activity.FaceDetectionActivity"
             android:screenOrientation="landscape"
             tools:ignore="LockedOrientationActivity" />
+
         <activity
             android:name=".activity.TextifyActivity"
             android:screenOrientation="portrait"

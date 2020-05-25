@@ -212,13 +212,13 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_input, jlong mat_addr_result,
                                                                      jlong cascadeClassifier_face, jlong cascadeClassifier_eye) {
-    bool tryflip = false;
-    double scale = 1;
+    //bool tryflip = false;
+    //double scale = 1;
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","선글라스 들어 옴 %d", 1);
 
     Mat glasses;
-    String glassesName = "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/sunglasses_black.png";
+    String glassesName = "sunglasses_black.png";
     glasses = imread(glassesName, IMREAD_UNCHANGED);
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","선글라스 이미지 받아옴 %d", 1);
@@ -233,7 +233,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
     vector<Rect> faces, faces2; // 탐지한 얼굴 정보(위치) 저장, faces2
 
     // 디스플레이의 색상 정보 Scalar 로 미리 저장
-    const static Scalar colors[] = {
+    /*const static Scalar colors[] = {
             Scalar(255,0,0),
             Scalar(255,128,0),
             Scalar(255,255,0),
@@ -242,7 +242,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
             Scalar(0,255,255),
             Scalar(0,0,255),
             Scalar(255,0,255)
-    };
+    };*/
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","cvt 직전 %d", 1);
 
@@ -263,6 +263,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
     //equalizeHist( smallImg, smallImg );
 
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","detectMultiScale 직전 %d", 1);
+
     ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces,
                                                                       1.1, 2, 0
                                                                               //|CASCADE_FIND_BIGGEST_OBJECT
@@ -271,9 +273,11 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
                                                                               |CASCADE_SCALE_IMAGE,
                                                                       Size(30, 30) );
 
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","얼굴 검출 for문 직전 %d", 1);
+
     //Mat result;
-    //for ( size_t i = 0; i < faces.size(); i++ ) {
-    for ( int i = 0; i < faces.size(); i++ ) {
+    //for ( int i = 0; i < faces.size(); i++ ) {
+    for ( size_t i = 0; i < faces.size(); i++ ) {
         // 찾은 얼굴의 x 값과 y 값 계산
         double real_facesize_x = faces[i].x / resizeRatio;
         double real_facesize_y = faces[i].y / resizeRatio;
@@ -282,16 +286,18 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
         double real_facesize_width = faces[i].width / resizeRatio;
         double real_facesize_height = faces[i].height / resizeRatio;
 
-        Rect r = faces[i];
+        //Rect r = faces[i];
         Mat faceROI; //smallImgROI;
         vector<Rect> eyes;
 
+        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","원 정의 직전 %d", 1);
+
         // 원 정의
-        Point center( real_facesize_x + real_facesize_width / 2, real_facesize_y + real_facesize_height / 2);
-        Scalar color = colors[i%8];
+        Point center( cvRound(real_facesize_x + real_facesize_width / 2), cvRound(real_facesize_y + real_facesize_height / 2));
+        //Scalar color = colors[i%8];
         //int radius;
 
-        ellipse(img_result, center, Size(real_facesize_width / 2, real_facesize_height / 2), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
+        ellipse(img_result, center, Size(cvRound(real_facesize_width / 2), cvRound(real_facesize_height / 2)), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
 
         /*double aspect_ratio = (double)r.width/r.height;
 
@@ -307,9 +313,10 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
         }
 
         smallImgROI = smallImg( r );*/
-        Rect faces_area(real_facesize_x, real_facesize_y, real_facesize_width, real_facesize_height);
+        Rect faces_area(cvRound(real_facesize_x), cvRound(real_facesize_y), cvRound(real_facesize_width), cvRound(real_facesize_height));
         faceROI = img_gray( faces_area );
 
+        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈 detectMultiScale 직전 %d", 1);
 
         ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes,
                                                                          1.1, 2, 0
@@ -323,10 +330,11 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
         vector<Point> points;
 
+        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈 검출 반복문 직전 %d", 1);
+
         // eyes.size() : 검출한 눈의 개수
         for ( size_t j = 0; j < eyes.size(); j++ ) {
-            Point eye_center(real_facesize_x + eyes[j].x + eyes[j].width/2,
-                    real_facesize_y + eyes[j].y + eyes[j].height/2);
+            Point eye_center(cvRound(real_facesize_x + eyes[j].x + eyes[j].width/2), cvRound(real_facesize_y + eyes[j].y + eyes[j].height/2));
 
             int radius = cvRound((eyes[j].width + eyes[j].height)*0.25);
 
@@ -343,12 +351,17 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
             // Scalar = 원의 색깔 BRG 순서 이 부분에서는 빨간색 원을 그려준다
             circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
 
-            Point p(center.x, center.y);
-            points.push_back(p);
+            __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈에 circle 직후 %d", 1);
+
+            //Point p(center.x, center.y);
+            points.push_back(eye_center);
         }
 
+        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","points.size() ==2 직전 %d", 1);
 
         if ( points.size() == 2){
+
+            __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","points.size() ==2 직후 %d", 1);
 
             Point center1 = points[0];
             Point center2 = points[1];
@@ -364,16 +377,20 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
             int width = abs(center2.x - center1.x);
             int height = abs(center2.y - center1.y);
 
+            __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","width > height 직전 %d", 1);
+
             if ( width > height) {
 
-                float imgScale = width/330.0;
+                __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","width < height 직후 %d", 1);
+
+                double imgScale = width/330.0;
 
                 int w, h;
-                w = glasses.cols * imgScale;
-                h = glasses.rows * imgScale;
+                w = cvRound(glasses.cols * imgScale);
+                h = cvRound(glasses.rows * imgScale);
 
-                int offsetX = 150 * imgScale;
-                int offsetY = 160 * imgScale;
+                int offsetX = cvRound(150 * imgScale);
+                int offsetY = cvRound(160 * imgScale);
 
                 Mat resized_glasses;
                 resize( glasses, resized_glasses, Size( w, h), 0, 0 );
@@ -392,7 +409,6 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location) {
     background.copyTo(output);
-
 
     // start at the row indicated by location, or at row 0 if location.y is negative.
     for (int y = max(location.y, 0); y < background.rows; ++y) {
@@ -429,8 +445,7 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
                         foreground.data[fY * foreground.step + fX * foreground.channels() + c];
                 unsigned char backgroundPx =
                         background.data[y * background.step + x * background.channels() + c];
-                output.data[y*output.step + output.channels()*x + c] =
-                        backgroundPx * (1. - opacity) + foregroundPx * opacity;
+                output.data[y*output.step + output.channels()*x + c] = backgroundPx * (1. - opacity) + foregroundPx * opacity;
             }
         }
     }
@@ -693,6 +708,9 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
 
     // faces.size() 가 0 이상이면 얼굴을 감지한 것으로 간주하여 진행
     for (int i = 0; i < faces.size(); i++) {
+        //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);
+
+
         // 찾은 얼굴의 x 값과 y 값 계산
         double real_facesize_x = faces[i].x / resizeRatio;
         double real_facesize_y = faces[i].y / resizeRatio;
@@ -717,6 +735,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
 
         vector<Rect> eyes; // 탐지한 눈의 정보(위치) 저장
 
+        //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 7);
+
         //-- In each face, detect eyes
         ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes,
                                                                          1.1, 2, 0
@@ -726,8 +746,12 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
                                                                                  |CASCADE_SCALE_IMAGE,
                                                                          Size(15, 15) );
 
+        //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 8);
+
         // eyes.size() : 검출한 눈의 개수
         for ( size_t j = 0; j < eyes.size(); j++ ) {
+            //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 9);
+
             Point eye_center( real_facesize_x + eyes[j].x + eyes[j].width/2, real_facesize_y + eyes[j].y + eyes[j].height/2 );
 
             int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
