@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
@@ -31,6 +32,7 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.CascadeClassifier;
@@ -583,6 +585,16 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             //double scale = 1;
             //DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
         }
+
+
+        // 보류 : 회면 돌아가는거 예외처리 작업
+        /*if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90) {
+            //가로 모드 일 때
+            // Do nothing
+        }else{
+            //세로 모드 일 때
+            Core.flip(matResult.t(), matResult, 1);
+        }*/
 
         return matResult;
     }
