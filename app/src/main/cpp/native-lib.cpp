@@ -230,7 +230,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
     Mat output2;
     img_input.copyTo(output2);
 
-    vector<Rect> faces, faces2; // 탐지한 얼굴 정보(위치) 저장, faces2
+    vector<Rect> faces;//, faces2; // 탐지한 얼굴 정보(위치) 저장, faces2
 
     // 디스플레이의 색상 정보 Scalar 로 미리 저장
     /*const static Scalar colors[] = {
@@ -275,7 +275,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","얼굴 검출 for문 직전 %d", 1);
 
-    //Mat result;
+    Mat result;
     //for ( int i = 0; i < faces.size(); i++ ) {
     for ( size_t i = 0; i < faces.size(); i++ ) {
         // 찾은 얼굴의 x 값과 y 값 계산
@@ -381,7 +381,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
             if ( width > height) {
 
-                __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","width < height 직후 %d", 1);
+                __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","width > height 직후 %d", 1);
 
                 double imgScale = width/330.0;
 
@@ -393,18 +393,26 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
                 int offsetY = cvRound(160 * imgScale);
 
                 Mat resized_glasses;
+
+                __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","resize 직전 %d", 1);
+
+                // TODO : resize() 함수에서 에러 발생 (아래는 에러 내용)
+                // E/cv::error(): OpenCV(4.3.0) Error: Assertion failed (!ssize.empty()) in resize, file /build/master_pack-android/opencv/modules/imgproc/src/resize.cpp, line 3929
+                // E/libc++abi: terminating with uncaught exception of type cv::Exception: OpenCV(4.3.0)
+                //                              /build/master_pack-android/opencv/modules/imgproc/src/resize.cpp:3929: error: (-215:Assertion failed) !ssize.empty() in function 'resize'
                 resize( glasses, resized_glasses, Size( w, h), 0, 0 );
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직전 %d", 1);
 
-                overlayImage(output2, resized_glasses, img_result, Point(center1.x-offsetX, center1.y-offsetY));
+                overlayImage(output2, resized_glasses, result, Point(center1.x-offsetX, center1.y-offsetY));
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직후 %d", 1);
 
-                output2 = img_result;
+                output2 = result;
             }
         }
     }
+    output2.copyTo(img_result);
 }
 
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location) {
