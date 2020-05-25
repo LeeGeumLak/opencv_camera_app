@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
     public native long LoadCascade(String cascadeFileName );
     public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
-    public native void DetectAndSunglasses(long mat_addr_input, long cascadeClassifier_face, long cascadeClassifier_eye);
+    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_result, long cascadeClassifier_face, long cascadeClassifier_eye);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 }*/
 
                 // 스티커 모드일때, 사진 캡쳐시
-                if(sticker == 1) {
+                /*if(sticker == 1) {
                     try {
                         //Log.d(TAG, "capture : after try");
 
@@ -331,10 +331,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                         getWriteLock();
 
                         //Log.d(TAG, "capture : after getWriteLock()");
-                        /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
+                        *//*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
                         path.mkdirs();
                         File file = new File(path, "image.png");
-                     String filename = file.toString();*/
+                     String filename = file.toString();*//*
 
                         fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
@@ -344,13 +344,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                         // 씌운 파일을 이미지 프리뷰 액티비티로 putExtra하여 인텐트 이동
 
-                        /*long addr = matInput.getNativeObjAddr();
+                        *//*long addr = matInput.getNativeObjAddr();
                         Intent previewImgIntent = new Intent(MainActivity.this, PhotoPreviewActivity.class);
                         previewImgIntent.putExtra("matInput", addr);
                         //previewImgIntent.putExtra("file", file);
 
                         startActivityForResult(previewImgIntent, RequestPreviewImg);
-*/
+*//*
                         // ForResult 로 받아온 ret 값에 따라서 사진 저장 성공/실패 여부
                         if ( ret ) {
                             Log.d(TAG, "take picture SUCCESS");
@@ -368,9 +368,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     }
                     releaseWriteLock();
 
-                }
+                }*/
                 // 스티커 모드가 아닐때, 사진 캡쳐시
-                else {
+                //else {
                     try {
                         Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
                         //Log.d(TAG, "capture : after try");
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                         e.printStackTrace();
                     }
                     releaseWriteLock();
-                }
+                //}
             }
         });
 
@@ -581,7 +581,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
         }
         if(sticker == 1) {
-            DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+            DetectAndSunglasses( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
+
+            //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
             //double scale = 1;
             //DetectAndSunglasses(matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face,cascadeClassifier_eye, scale);
         }
