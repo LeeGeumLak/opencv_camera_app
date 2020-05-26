@@ -128,14 +128,52 @@
         android:background="@drawable/change" />
 
     <Button
-        android:id="@+id/Button_webRtc"
+        android:id="@+id/Button_settings"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="357dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/video_camera" />
+        android:background="@drawable/settings" />
+
+    <Button
+        android:id="@+id/Button_webRtc"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="307dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/video_camera"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/Textview_webRtc"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="312dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="화상통화"
+        android:textSize="20dp"
+        android:textColor="@color/white"
+        android:visibility="invisible"/>
+
+    <Switch
+        android:id="@+id/notificationSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="257dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:switchPadding="30dp"
+        android:text="알람"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/Button_gallery"

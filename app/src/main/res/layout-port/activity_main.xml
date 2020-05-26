@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@color/black"
     tools:context=".activity.MainActivity"
     tools:ignore="MissingDefaultResource">
 
@@ -119,14 +119,53 @@
         android:background="@drawable/camera_ok" />
 
     <Button
-        android:id="@+id/Button_webRtc"
+        android:id="@+id/Button_settings"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="9dp"
         android:layout_marginTop="9dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="344dp"
-        android:background="@drawable/video_camera" />
+        android:background="@drawable/settings" />
+
+    <Button
+        android:id="@+id/Button_webRtc"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="59dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="344dp"
+        android:background="@drawable/video_camera"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/Textview_webRtc"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="59dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="344dp"
+        android:text="화상통화"
+        android:textSize="20dp"
+        android:textColor="@color/white"
+        android:visibility="invisible"/>
+
+
+    <Switch
+        android:id="@+id/notificationSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="109dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="344dp"
+        android:switchPadding="30dp"
+        android:text="알람"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:visibility="invisible"/>
 
     <Button
         android:id="@+id/Button_change"
