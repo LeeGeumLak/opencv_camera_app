@@ -7,7 +7,10 @@ import androidx.core.content.FileProvider;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.FaceDetector;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
@@ -32,11 +35,13 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.CascadeClassifier;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
     public native long LoadCascade(String cascadeFileName );
     public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
-    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_result, long cascadeClassifier_face, long cascadeClassifier_eye);
+    public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_result, long mat_addr_sunglasses ,long cascadeClassifier_face, long cascadeClassifier_eye);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
@@ -562,34 +567,49 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // inputFrame 에 filter 씌어서 outputFrame 으로 return
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        matInput = inputFrame.rgba();
 
-        if (matResult == null) {
-            matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
-        }
+        try {
+            getWriteLock();
+            matInput = inputFrame.rgba();
 
-        matResult = matInput;
+            if (matResult == null) {
+                matResult = new Mat(matInput.rows(), matInput.cols(), matInput.type());
+            }
 
-        // 필터링
+            matResult = matInput;
+
+            // 필터링
         /*if(RGBA == 1) {
             matResult = matInput;
         }*/
-        if(GrayScale == 1) {
-            ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
-        }
-        if(HSV == 1) {
-            ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
-        }
-        if(sticker == 1) {
-            // 얼굴 검출
-            //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+            if(GrayScale == 1) {
+                ConvertRGBtoGray(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+            }
+            if(HSV == 1) {
+                ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+            }
+            if(sticker == 1) {
+                // 얼굴 검출
+                //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
 
-            // 얼굴 검출 후, 선글라스 씌우기
-            DetectAndSunglasses( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
-        }
+                // 얼굴 검출 후, 선글라스 씌우기
+                Mat matSunglasses = new Mat();
+                AssetManager assetManager = getAssets();
+                BufferedInputStream buf;
+                try {
+                    buf = new BufferedInputStream(assetManager.open("sunglasses_black.png"));
+                    Bitmap bitmap = BitmapFactory.decodeStream(buf);
 
+                    Utils.bitmapToMat(bitmap, matSunglasses);
 
-        // 보류 : 회면 돌아가는거 예외처리 작업
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+                DetectAndSunglasses( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), matSunglasses.getNativeObjAddr() ,cascadeClassifier_face, cascadeClassifier_eye);
+            }
+
+            // 보류 : 회면 돌아가는거 예외처리 작업
         /*if(getWindowManager().getDefaultDisplay().getRotation() == Surface.ROTATION_90) {
             //가로 모드 일 때
             // Do nothing
@@ -597,6 +617,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             //세로 모드 일 때
             Core.flip(matResult.t(), matResult, 1);
         }*/
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        releaseWriteLock();
 
         return matResult;
     }

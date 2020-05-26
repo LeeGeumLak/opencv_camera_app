@@ -210,16 +210,16 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
 // Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_input, jlong mat_addr_result,
+Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_input, jlong mat_addr_result, jlong mat_addr_sunglasses,
                                                                      jlong cascadeClassifier_face, jlong cascadeClassifier_eye) {
     //bool tryflip = false;
     //double scale = 1;
 
-    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","선글라스 들어 옴 %d", 1);
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "DetectAndSunglasses 진입 %d", 1);
 
-    Mat glasses;
-    String glassesName = "sunglasses_black.png";
-    glasses = imread(glassesName, IMREAD_UNCHANGED);
+    Mat &glasses = *(Mat *) mat_addr_sunglasses;
+    //String glassesName = "sunglasses_black.png";
+    //glasses = imread(glassesName, IMREAD_UNCHANGED);
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","선글라스 이미지 받아옴 %d", 1);
 
@@ -257,9 +257,10 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
     //Mat smallImg;
     Mat img_resize;
-    double resizeRatio = imgResize(img_gray, img_resize, 640);
+    //double resizeRatio = imgResize(img_gray, img_resize, 640);
     //double fx = 1 / scale;
     //resize( img_gray, smallImg, Size(), fx, fx, INTER_LINEAR_EXACT );
+    resize( img_gray, img_resize, Size(), 1, 1, INTER_LINEAR_EXACT );
 
     //equalizeHist( smallImg, smallImg );
 
@@ -279,29 +280,41 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
     //for ( int i = 0; i < faces.size(); i++ ) {
     for ( size_t i = 0; i < faces.size(); i++ ) {
         // 찾은 얼굴의 x 값과 y 값 계산
-        double real_facesize_x = faces[i].x / resizeRatio;
-        double real_facesize_y = faces[i].y / resizeRatio;
+        //double real_facesize_x = faces[i].x / resizeRatio;
+        //double real_facesize_y = faces[i].y / resizeRatio;
 
         // 얼굴의 높이와 너비 계산
-        double real_facesize_width = faces[i].width / resizeRatio;
-        double real_facesize_height = faces[i].height / resizeRatio;
+        //double real_facesize_width = faces[i].width / resizeRatio;
+        //double real_facesize_height = faces[i].height / resizeRatio;
 
-        //Rect r = faces[i];
+        Rect r = faces[i];
         Mat faceROI; //smallImgROI;
         vector<Rect> eyes;
 
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","원 정의 직전 %d", 1);
 
         // 원 정의
-        Point center( cvRound(real_facesize_x + real_facesize_width / 2), cvRound(real_facesize_y + real_facesize_height / 2));
+        Point center;
+        //Point center( cvRound(real_facesize_x + real_facesize_width / 2), cvRound(real_facesize_y + real_facesize_height / 2));
         //Scalar color = colors[i%8];
-        //int radius;
+        int radius;
 
-        ellipse(img_result, center, Size(cvRound(real_facesize_width / 2), cvRound(real_facesize_height / 2)), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
+        //ellipse(img_result, center, Size(cvRound(real_facesize_width / 2), cvRound(real_facesize_height / 2)), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
 
-        /*double aspect_ratio = (double)r.width/r.height;
+        double aspect_ratio = (double)r.width/r.height;
 
         if( 0.75 < aspect_ratio && aspect_ratio < 1.3 ) {
+            center.x = cvRound(r.x + r.width*0.5);
+            center.y = cvRound(r.y + r.height*0.5);
+            radius = cvRound((r.width + r.height)*0.25);
+            circle( img_result, center, radius, Scalar(255, 192, 0), 4, 8, 0 );
+        }
+        else {
+            rectangle( img_result, Point(cvRound(r.x), cvRound(r.y)),
+                       Point(cvRound((r.x + r.width-1)), cvRound((r.y + r.height-1))), Scalar(255, 192, 0), 4, 8, 0);
+        }
+
+        /*if( 0.75 < aspect_ratio && aspect_ratio < 1.3 ) {
             center.x = cvRound((r.x + r.width*0.5)*scale);
             center.y = cvRound((r.y + r.height*0.5)*scale);
             radius = cvRound((r.width + r.height)*0.25*scale);
@@ -310,11 +323,12 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
         else {
             rectangle(img_input, Point(cvRound(r.x * scale), cvRound(r.y * scale)),
                       Point(cvRound((r.x + r.width - 1) * scale), cvRound((r.y + r.height - 1) * scale)), color, 3, 8, 0);
-        }
+        }*/
 
-        smallImgROI = smallImg( r );*/
-        Rect faces_area(cvRound(real_facesize_x), cvRound(real_facesize_y), cvRound(real_facesize_width), cvRound(real_facesize_height));
-        faceROI = img_gray( faces_area );
+        //smallImgROI = smallImg( r );
+        //Rect faces_area(cvRound(real_facesize_x), cvRound(real_facesize_y), cvRound(real_facesize_width), cvRound(real_facesize_height));
+        faceROI = img_gray( r );
+        //faceROI = img_gray( faces[i] );
 
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈 detectMultiScale 직전 %d", 1);
 
@@ -334,9 +348,15 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
         // eyes.size() : 검출한 눈의 개수
         for ( size_t j = 0; j < eyes.size(); j++ ) {
-            Point eye_center(cvRound(real_facesize_x + eyes[j].x + eyes[j].width/2), cvRound(real_facesize_y + eyes[j].y + eyes[j].height/2));
+            //Point eye_center(cvRound(real_facesize_x + eyes[j].x + eyes[j].width/2), cvRound(real_facesize_y + eyes[j].y + eyes[j].height/2));
 
-            int radius = cvRound((eyes[j].width + eyes[j].height)*0.25);
+            //int radius = cvRound((eyes[j].width + eyes[j].height)*0.25);
+
+            Rect nr = eyes[j];
+            center.x = cvRound((r.x + nr.x + nr.width*0.5));
+            center.y = cvRound((r.y + nr.y + nr.height*0.5));
+            radius = cvRound((nr.width + nr.height)*0.25);
+            circle( img_result, center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
 
             /*Rect nr = eyes[j];
             center.x = cvRound((r.x + nr.x + nr.width*0.5)*scale);
@@ -349,12 +369,13 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
             // eye_center = 원의 중심 좌표
             // radius = 원의 반지름
             // Scalar = 원의 색깔 BRG 순서 이 부분에서는 빨간색 원을 그려준다
-            circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
+            //circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
 
             __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈에 circle 직후 %d", 1);
 
-            //Point p(center.x, center.y);
-            points.push_back(eye_center);
+            //push_back : vector의 끝에 요소를 추가
+            Point p(center.x, center.y);
+            points.push_back( p );
         }
 
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","points.size() ==2 직전 %d", 1);
@@ -363,8 +384,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
             __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","points.size() ==2 직후 %d", 1);
 
-            Point center1 = points[0];
-            Point center2 = points[1];
+            Point center1 = points[0]; // 눈 1
+            Point center2 = points[1]; // 눈 2
 
             if ( center1.x > center2.x ) {
                 Point temp;
@@ -383,7 +404,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","width > height 직후 %d", 1);
 
-                double imgScale = width/330.0;
+                double imgScale = width/250.0;
 
                 int w, h;
                 w = cvRound(glasses.cols * imgScale);
@@ -400,7 +421,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
                 // E/cv::error(): OpenCV(4.3.0) Error: Assertion failed (!ssize.empty()) in resize, file /build/master_pack-android/opencv/modules/imgproc/src/resize.cpp, line 3929
                 // E/libc++abi: terminating with uncaught exception of type cv::Exception: OpenCV(4.3.0)
                 //                              /build/master_pack-android/opencv/modules/imgproc/src/resize.cpp:3929: error: (-215:Assertion failed) !ssize.empty() in function 'resize'
-                resize( glasses, resized_glasses, Size( w, h), 0, 0 );
+                //resize( glasses, resized_glasses, Size( w, h), 0, 0);
+                resize( glasses, resized_glasses, cv::Size( w, h), 0, 0 );
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직전 %d", 1);
 
@@ -408,7 +430,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직후 %d", 1);
 
-                output2 = result;
+                output2 = result.clone();
             }
         }
     }
@@ -417,6 +439,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location) {
     background.copyTo(output);
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 반복문 시작 직전", 1);
 
     // start at the row indicated by location, or at row 0 if location.y is negative.
     for (int y = max(location.y, 0); y < background.rows; ++y) {
@@ -439,10 +463,7 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
             }
 
             // determine the opacity of the foregrond pixel, using its fourth (alpha) channel.
-            double opacity =
-                    ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3])
-
-                    / 255.;
+            double opacity = ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3]) / 255.;
 
 
             // and now combine the background and foreground pixel, using the opacity,
@@ -457,6 +478,9 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
             }
         }
     }
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 반복문 끝 직후", 1);
+
 }
 
 // cascade file copy and load
