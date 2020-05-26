@@ -404,7 +404,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","width > height 직후 %d", 1);
 
-                double imgScale = width/250.0;
+                double imgScale = width/200.0;
 
                 int w, h;
                 w = cvRound(glasses.cols * imgScale);
