@@ -58,20 +58,30 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     private static final String TAG = "MainActivity";
 
+    // 액티비티 내 버튼, 텍스트뷰, 스위치 버튼
     private Button Button_RGB, Button_Gray, Button_HSV, Button_text, Button_capture, Button_sticker;
     private Button Button_settings, Button_webRtc, Button_change, Button_filter, Button_gallery;
     private TextView Textview_webRtc;
     private Switch Switch_notification;
 
+    // 카메라로 들어오는 화면과 출력해주는 화면
     private Mat matInput, matResult;
+
+    // 카메라 필터 관련 변수
     private int GrayScale, RGBA, HSV, sticker;
 
+    // 카메라 상태
     private int cameraId = 0;
 
+    // 캡쳐한 사진 저장 관련
     private Uri fileUri;
     private File file;
     private File mediaStorageDir; // 캡쳐한 이미지가 저장되는 디렉토리
     private String filename;
+
+    // 알람 설정 유무
+    // TODO : sharedpreference에서 값 가져와 초기화 해줘야함 (내용 없으면 false 로)
+    boolean isNotiChecked = false;
 
     // 버튼 클릭시, 애니메이션 이벤트
     private Animation btnOpen, btnClose;
@@ -234,10 +244,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         // 스위치 버튼 부분
         Switch_notification = findViewById(R.id.Switch_notification);
+        Switch_notification.setChecked(isNotiChecked);
 
         Switch_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isNotiChecked = isChecked;
+                Switch_notification.setChecked(isChecked);
+
                 // 알람 설정이 되었을 때
                 if(isChecked) {
                     Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
