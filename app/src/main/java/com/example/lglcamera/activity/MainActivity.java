@@ -3,8 +3,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -52,6 +54,7 @@ import java.util.concurrent.Semaphore;
 import static android.Manifest.permission.CAMERA;
 import static android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+import static java.lang.System.exit;
 
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
@@ -81,7 +84,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     // 알람 설정 유무
     // TODO : sharedpreference에서 값 가져와 초기화 해줘야함 (내용 없으면 false 로)
-    boolean isNotiChecked = false;
+    private SharedPreferences alarmSp;
+    boolean isNotiChecked;// = false;
+    private String keyword;
 
     // 버튼 클릭시, 애니메이션 이벤트
     private Animation btnOpen, btnClose;
@@ -201,6 +206,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
        /* StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());*/
 
+        // sharedpreference에서 알람 on/off 유무 따져서 초기화
+        alarmSp = getSharedPreferences("alarmFile", MODE_PRIVATE);
+        isNotiChecked = alarmSp.getBoolean("alarmOnOff", false);
+
         init();
 
         // xml 파일 읽어와 객체 로드
@@ -250,15 +259,28 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isNotiChecked = isChecked;
-                Switch_notification.setChecked(isChecked);
+                Switch_notification.setChecked(isNotiChecked);
 
                 // 알람 설정이 되었을 때
-                if(isChecked) {
+                if(isNotiChecked) {
+                    // TODO : 서비스, 브로드캐스트 리시버 실행 기능 추가
+
                     Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 }
                 else {
+                    // TODO : 서비스, 브로드캐스트 리시버 실행 멈춤 기능 추가
+
                     Toast.makeText(MainActivity.this, "알람 설정이 해제되었습니다.", Toast.LENGTH_SHORT).show();
                 }
+
+                // 변경된 값을 저장
+                //SharedPreferences를 alarmFile이름, 기본모드로 설정
+                SharedPreferences sharedPreferences = getSharedPreferences("alarmFile",MODE_PRIVATE);
+
+                //저장을 하기위해 editor를 이용하여 값을 저장시켜준다.
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                editor.putBoolean("alarmOnOff", isNotiChecked); // key, value를 이용하여 저장하는 형태
             }
         });
 
@@ -552,6 +574,22 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             openCvCameraView.disableView();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Activity가 종료되기 전에 저장한다.
+        //SharedPreferences를 alarmFile이름, 기본모드로 설정
+        SharedPreferences sharedPreferences = getSharedPreferences("alarmFile",MODE_PRIVATE);
+
+        //저장을 하기위해 editor를 이용하여 값을 저장시켜준다.
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("alarmOnOff", isNotiChecked); // key, value를 이용하여 저장하는 형태
+
+        //최종 커밋
+        editor.commit();
+    }
     @Override
     public void onResume() {
         super.onResume();
