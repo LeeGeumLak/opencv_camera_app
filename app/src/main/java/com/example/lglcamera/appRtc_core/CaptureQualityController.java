@@ -8,11 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.example.lglcamera.R;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;

@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -19,6 +19,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.example.lglcamera.R;
 
 import org.webrtc.RendererCommon.ScalingType;
 

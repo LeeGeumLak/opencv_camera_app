@@ -8,11 +8,13 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
+import com.example.lglcamera.R;
 
 /**
  * Settings fragment for AppRTC.

@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 import android.content.Context;
 import android.os.Environment;
@@ -36,8 +36,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.example.lglcamera.AppRTCClient.SignalingParameters;
-import com.example.lglcamera.RecordedAudioToFileController;
+import com.example.lglcamera.appRtc_core.AppRTCClient.SignalingParameters;
+
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.CameraVideoCapturer;

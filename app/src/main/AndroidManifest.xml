@@ -35,6 +35,10 @@
         android:name="android.permission.CAPTURE_VIDEO_OUTPUT"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- notification permission   -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <!-- storage permission -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -60,11 +64,11 @@
             tools:ignore="LockedOrientationActivity"/>
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".appRtc_core.SettingsActivity"
             android:label="@string/settings_name"/>
 
         <activity
-            android:name=".ConnectActivity"
+            android:name=".appRtc_core.ConnectActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -79,7 +83,7 @@
         </activity>
 
         <activity
-            android:name=".CallActivity"
+            android:name=".appRtc_core.CallActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:screenOrientation="fullUser"
@@ -122,6 +126,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-    </application>
 
+        <!--  알림 기능을 위한 service와 receiver   -->
+        <service android:name=".alarm_core.AlarmService"/>
+
+        <receiver
+            android:name=".alarm_core.AlarmReceiver"
+            android:enabled="true"/>
+
+    </application>
 </manifest>

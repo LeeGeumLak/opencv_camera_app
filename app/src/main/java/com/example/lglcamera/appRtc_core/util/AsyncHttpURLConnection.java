@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera.util;
+package com.example.lglcamera.appRtc_core.util;
 
 import java.io.IOException;
 import java.io.InputStream;

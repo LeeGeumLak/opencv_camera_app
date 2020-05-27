@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 import android.util.Log;
 import java.io.IOException;
@@ -18,9 +18,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.List;
-import com.example.lglcamera.AppRTCClient.SignalingParameters;
-import com.example.lglcamera.util.AsyncHttpURLConnection;
-import com.example.lglcamera.util.AsyncHttpURLConnection.AsyncHttpEvents;
+import com.example.lglcamera.appRtc_core.AppRTCClient.SignalingParameters;
+import com.example.lglcamera.appRtc_core.util.AsyncHttpURLConnection;
+import com.example.lglcamera.appRtc_core.util.AsyncHttpURLConnection.AsyncHttpEvents;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

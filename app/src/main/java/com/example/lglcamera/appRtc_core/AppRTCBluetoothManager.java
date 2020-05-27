@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
@@ -30,7 +30,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 import java.util.Set;
-import com.example.lglcamera.util.AppRTCUtils;
+import com.example.lglcamera.appRtc_core.util.AppRTCUtils;
 import org.webrtc.ThreadUtils;
 
 /**

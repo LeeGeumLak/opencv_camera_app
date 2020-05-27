@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 
 import android.os.Handler;
@@ -17,11 +17,11 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.lglcamera.RoomParametersFetcher.RoomParametersFetcherEvents;
-import com.example.lglcamera.WebSocketChannelClient.WebSocketChannelEvents;
-import com.example.lglcamera.WebSocketChannelClient.WebSocketConnectionState;
-import com.example.lglcamera.util.AsyncHttpURLConnection;
-import com.example.lglcamera.util.AsyncHttpURLConnection.AsyncHttpEvents;
+import com.example.lglcamera.appRtc_core.RoomParametersFetcher.RoomParametersFetcherEvents;
+import com.example.lglcamera.appRtc_core.WebSocketChannelClient.WebSocketChannelEvents;
+import com.example.lglcamera.appRtc_core.WebSocketChannelClient.WebSocketConnectionState;
+import com.example.lglcamera.appRtc_core.util.AsyncHttpURLConnection;
+import com.example.lglcamera.appRtc_core.util.AsyncHttpURLConnection.AsyncHttpEvents;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

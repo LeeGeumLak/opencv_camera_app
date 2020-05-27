@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 
 import android.annotation.TargetApi;
@@ -40,12 +40,14 @@ import java.lang.RuntimeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import com.example.lglcamera.AppRTCAudioManager.AudioDevice;
-import com.example.lglcamera.AppRTCAudioManager.AudioManagerEvents;
-import com.example.lglcamera.AppRTCClient.RoomConnectionParameters;
-import com.example.lglcamera.AppRTCClient.SignalingParameters;
-import com.example.lglcamera.PeerConnectionClient.DataChannelParameters;
-import com.example.lglcamera.PeerConnectionClient.PeerConnectionParameters;
+
+import com.example.lglcamera.R;
+import com.example.lglcamera.appRtc_core.AppRTCAudioManager.AudioDevice;
+import com.example.lglcamera.appRtc_core.AppRTCAudioManager.AudioManagerEvents;
+import com.example.lglcamera.appRtc_core.AppRTCClient.RoomConnectionParameters;
+import com.example.lglcamera.appRtc_core.AppRTCClient.SignalingParameters;
+import com.example.lglcamera.appRtc_core.PeerConnectionClient.DataChannelParameters;
+import com.example.lglcamera.appRtc_core.PeerConnectionClient.PeerConnectionParameters;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraEnumerator;

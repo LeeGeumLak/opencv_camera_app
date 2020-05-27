@@ -1,5 +1,4 @@
 package com.example.lglcamera.activity;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -9,26 +8,25 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.FaceDetector;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Parcelable;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.lglcamera.ConnectActivity;
+import com.example.lglcamera.appRtc_core.ConnectActivity;
 import com.example.lglcamera.R;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -36,10 +34,8 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.objdetect.CascadeClassifier;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -63,7 +59,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private static final String TAG = "MainActivity";
 
     private Button Button_RGB, Button_Gray, Button_HSV, Button_text, Button_capture, Button_sticker;
-    private Button Button_webRtc, Button_change, Button_filter, Button_gallery;
+    private Button Button_settings, Button_webRtc, Button_change, Button_filter, Button_gallery;
+    private TextView Textview_webRtc;
+    private Switch Switch_notification;
 
     private Mat matInput, matResult;
     private int GrayScale, RGBA, HSV, sticker;
@@ -77,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     // 버튼 클릭시, 애니메이션 이벤트
     private Animation btnOpen, btnClose;
-    private boolean isBtnOpen = false;
+    private boolean isFilterBtnOpen = false;
+    private boolean isSettingsBtnOpen = false;
 
     private CameraBridgeViewBase openCvCameraView;
 
@@ -192,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
        /* StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());*/
 
-        buttonInit();
+        init();
 
         // xml 파일 읽어와 객체 로드
         read_cascade_file();
@@ -205,8 +204,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         cameraId = CAMERA_FACING_BACK;
     }
 
-    // 버튼 초기화 및 리스너 설정
-    private void buttonInit() {
+    // 버튼, 텍스트뷰 등 초기화 및 리스너 설정
+    private void init() {
+        // 버튼 부분
         Button_filter = findViewById(R.id.Button_filter);
 
         Button_RGB = findViewById(R.id.Button_RGB);
@@ -219,12 +219,48 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_change = findViewById(R.id.Button_change);
         Button_gallery = findViewById(R.id.Button_gallery);
         Button_webRtc = findViewById(R.id.Button_webRtc);
+        Button_settings = findViewById(R.id.Button_settings);
+
+        // 텍스트뷰 부분
+        Textview_webRtc = findViewById(R.id.Textview_webRtc);
+
+        Textview_webRtc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent faceTalkIntent = new Intent(MainActivity.this, ConnectActivity.class);
+                startActivity(faceTalkIntent);
+            }
+        });
+
+        // 스위치 버튼 부분
+        Switch_notification = findViewById(R.id.Switch_notification);
+
+        Switch_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // 알람 설정이 되었을 때
+                if(isChecked) {
+                    Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(MainActivity.this, "알람 설정이 해제되었습니다.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // 설정 버튼 리스너
+        Button_settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleSettingsBtn();
+            }
+        });
 
         // 카메라 필터 관련 버튼
         Button_filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleBtn();
+                toggleFilterBtn();
             }
         });
 
@@ -326,87 +362,38 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }*/
 
-                // 스티커 모드일때, 사진 캡쳐시
-                /*if(sticker == 1) {
-                    try {
-                        //Log.d(TAG, "capture : after try");
+                //사진 캡쳐시
+                try {
+                    Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+                    //Log.d(TAG, "capture : after try");
 
-                        Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
+                    getWriteLock();
 
-                        getWriteLock();
-
-                        //Log.d(TAG, "capture : after getWriteLock()");
-                        *//*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
-                        path.mkdirs();
-                        File file = new File(path, "image.png");
-                     String filename = file.toString();*//*
-
-                        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
-
-                        DetectAndSunglasses( matInput.getNativeObjAddr(), cascadeClassifier_face, cascadeClassifier_eye);
-
-                        ret = Imgcodecs.imwrite( filename, matInput); // 위 생성한 파일에 현재 카메라 화면 씌움(얼굴 인식하여 동그라미로 표시된 것은 X)
-
-                        // 씌운 파일을 이미지 프리뷰 액티비티로 putExtra하여 인텐트 이동
-
-                        *//*long addr = matInput.getNativeObjAddr();
-                        Intent previewImgIntent = new Intent(MainActivity.this, PhotoPreviewActivity.class);
-                        previewImgIntent.putExtra("matInput", addr);
-                        //previewImgIntent.putExtra("file", file);
-
-                        startActivityForResult(previewImgIntent, RequestPreviewImg);
-*//*
-                        // ForResult 로 받아온 ret 값에 따라서 사진 저장 성공/실패 여부
-                        if ( ret ) {
-                            Log.d(TAG, "take picture SUCCESS");
-
-                            Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                            mediaScanIntent.setData(Uri.fromFile(file));
-                            sendBroadcast(mediaScanIntent);
-                        }
-                        else {
-                            Log.d(TAG, "take picture FAIL");
-                        }
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    releaseWriteLock();
-
-                }*/
-                // 스티커 모드가 아닐때, 사진 캡쳐시
-                //else {
-                    try {
-                        Toast.makeText(getApplicationContext(), "taking picture", Toast.LENGTH_SHORT).show();
-                        //Log.d(TAG, "capture : after try");
-
-                        getWriteLock();
-
-                        //Log.d(TAG, "capture : after getWriteLock()");
+                    //Log.d(TAG, "capture : after getWriteLock()");
                     /*File path = new File(Environment.getExternalStorageDirectory() + "/Images/");
                     path.mkdirs();
                     File file = new File(path, "image.png");
                     String filename = file.toString();*/
 
-                        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
+                    fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // 이미지를 저장할 파일 생성
 
-                        ret = Imgcodecs.imwrite(filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
+                    ret = Imgcodecs.imwrite(filename, matResult); // 위 생성한 파일에 현재 카메라 화면 씌움
 
-                        if (ret) {
-                            Log.d(TAG, "take picture SUCCESS");
-                        } else {
-                            Log.d(TAG, "take picture FAIL");
-                        }
-
-                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                        mediaScanIntent.setData(Uri.fromFile(file));
-                        sendBroadcast(mediaScanIntent);
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if (ret) {
+                        Log.d(TAG, "take picture SUCCESS");
+                    } else {
+                        Log.d(TAG, "take picture FAIL");
                     }
-                    releaseWriteLock();
-                //}
+
+                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    mediaScanIntent.setData(Uri.fromFile(file));
+                    sendBroadcast(mediaScanIntent);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                releaseWriteLock();
+
             }
         });
 
@@ -428,15 +415,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     }*/
 
     // 필터 버튼 클릭시, 애니메이션 이벤트
-    private void toggleBtn() {
-        if(isBtnOpen) {
+    private void toggleFilterBtn() {
+        if(isFilterBtnOpen) {
             Button_filter.setBackgroundResource(R.drawable.filter_change);
             Button_Gray.startAnimation(btnClose);
             Button_RGB.startAnimation(btnClose);
             Button_HSV.startAnimation(btnClose);
             Button_text.startAnimation(btnClose);
             Button_sticker.startAnimation(btnClose);
-            isBtnOpen = false;
+            isFilterBtnOpen = false;
         }
         else {
             Button_filter.setBackgroundResource(R.drawable.filter_pressed);
@@ -445,7 +432,25 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             Button_HSV.startAnimation(btnOpen);
             Button_text.startAnimation(btnOpen);
             Button_sticker.startAnimation(btnOpen);
-            isBtnOpen = true;
+            isFilterBtnOpen = true;
+        }
+    }
+
+    // 셋팅 버튼 클릭시, 애니메이션 이벤트
+    private void toggleSettingsBtn() {
+        if(isSettingsBtnOpen) {
+            Button_settings.setBackgroundResource(R.drawable.settings);
+            Button_webRtc.startAnimation(btnClose);
+            Textview_webRtc.startAnimation(btnClose);
+            Switch_notification.startAnimation(btnClose);
+            isSettingsBtnOpen = false;
+        }
+        else {
+            Button_settings.setBackgroundResource(R.drawable.settings_pressed);
+            Button_webRtc.startAnimation(btnOpen);
+            Textview_webRtc.startAnimation(btnOpen);
+            Switch_notification.startAnimation(btnOpen);
+            isSettingsBtnOpen = true;
         }
     }
 

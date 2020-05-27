@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.example.lglcamera;
+package com.example.lglcamera.appRtc_core;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,7 +27,9 @@ import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import com.example.lglcamera.util.AppRTCUtils;
+
+import com.example.lglcamera.R;
+import com.example.lglcamera.appRtc_core.util.AppRTCUtils;
 import org.webrtc.ThreadUtils;
 
 /**
