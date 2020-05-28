@@ -6,11 +6,13 @@ import android.content.Intent;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private Context context;
+    private String INTENT_ACTION = Intent.ACTION_BOOT_COMPLETED;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
         this.context = context;
+
         // intent 로부터 전달받은 string
         String get_yout_string = intent.getExtras().getString("state");
 
@@ -19,12 +21,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // service로 string값 보내기
         service_intent.putExtra("state", get_yout_string);
-        // start the service
 
+        // start the service
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
             this.context.startForegroundService(service_intent);
         }
-        else{
+        else {
             this.context.startService(service_intent);
         }
     }

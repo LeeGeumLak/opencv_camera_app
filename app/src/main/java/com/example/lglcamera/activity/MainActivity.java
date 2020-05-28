@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +19,7 @@ import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -28,6 +32,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.lglcamera.alarm_core.AlarmReceiver;
 import com.example.lglcamera.appRtc_core.ConnectActivity;
 import com.example.lglcamera.R;
 
@@ -82,11 +87,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private File mediaStorageDir; // 캡쳐한 이미지가 저장되는 디렉토리
     private String filename;
 
-    // 알람 설정 유무
-    // TODO : sharedpreference에서 값 가져와 초기화 해줘야함 (내용 없으면 false 로)
+    // 알람 설정 관련
+    // TODO : sharedpreference에서 값 가져와 초기화 해줘야함 (내용 없으면 false 로) V
     private SharedPreferences alarmSp;
     boolean isNotiChecked;// = false;
     private String keyword;
+    private PendingIntent pendingIntent;
+    private AlarmManager alarmManager;
 
     // 버튼 클릭시, 애니메이션 이벤트
     private Animation btnOpen, btnClose;
@@ -261,14 +268,38 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 isNotiChecked = isChecked;
                 Switch_notification.setChecked(isNotiChecked);
 
+                // 알람리시버 intent 생성
+                final Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
+                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+
                 // 알람 설정이 되었을 때
                 if(isNotiChecked) {
                     // TODO : 서비스, 브로드캐스트 리시버 실행 기능 추가
+                    // 리시버에 string 값 넘겨주기
+                    alarmIntent.putExtra("state", "alarm on");
+
+                    // 알람 설정
+                    long triggerTime = SystemClock.elapsedRealtime() + 1000*60; // 1분
+                    alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, triggerTime, 1000*60, pendingIntent);
 
                     Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 }
                 else {
+                    // dummpy intent
+                    //Intent tempIntent = new Intent();
+
                     // TODO : 서비스, 브로드캐스트 리시버 실행 멈춤 기능 추가
+                    // 리시버에 string 값 넘겨주기
+                    alarmIntent.putExtra("state", "alarm off");
+
+                    // 알람 설정 해제
+                    alarmManager.cancel(pendingIntent);
+
+                    if(pendingIntent != null) {
+                        alarmManager.cancel(pendingIntent);
+                    }
+                    sendBroadcast(alarmIntent);
 
                     Toast.makeText(MainActivity.this, "알람 설정이 해제되었습니다.", Toast.LENGTH_SHORT).show();
                 }

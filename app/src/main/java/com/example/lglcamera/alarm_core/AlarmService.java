@@ -2,6 +2,7 @@ package com.example.lglcamera.alarm_core;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +15,11 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.example.lglcamera.R;
+import com.example.lglcamera.activity.MainActivity;
 
 
 public class AlarmService extends Service {
-
-    MediaPlayer mediaPlayer;
-    int startId = 0;
-    boolean isRunning;
+    private NotificationManager notificationManager;
 
     @Nullable
     @Override
@@ -32,19 +31,25 @@ public class AlarmService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(getApplicationContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel("default", "알람기능",
                     NotificationManager.IMPORTANCE_DEFAULT);
 
-            NotificationManager notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+            notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
             notificationManager.createNotificationChannel(channel);
 
             Notification notification = new NotificationCompat.Builder(this, "default")
-                    .setContentTitle("알람시작")
-                    .setContentText("알람음이 재생됩니다.")
+                    .setContentTitle("LGL Camera")
+                    .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
                     .setSmallIcon(R.mipmap.ic_launcher)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
                     .build();
 
+            //notificationManager.notify(1, notification);
             startForeground(1, notification);
         }
     }
@@ -57,18 +62,15 @@ public class AlarmService extends Service {
 
         assert getState != null;
         switch (getState) {
-            case "alarm on":
-                startId = 1;
-                break;
             case "alarm off":
-                startId = 0;
+                this.stopForeground(true);
+                notificationManager.cancel(1);
                 break;
             default:
-                startId = 0;
                 break;
         }
 
-        // 알람음 재생 X , 알람음 시작 클릭
+        /*// 알람음 재생 X , 알람음 시작 클릭
         if(!this.isRunning && startId == 1) {
 
             mediaPlayer = MediaPlayer.create(this,R.raw.alarm_sound);
@@ -105,7 +107,7 @@ public class AlarmService extends Service {
 
             this.isRunning = true;
             this.startId = 1;
-        }
+        }*/
 
         return START_NOT_STICKY;
     }
