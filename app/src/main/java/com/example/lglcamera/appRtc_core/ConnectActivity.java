@@ -115,7 +115,7 @@ public class ConnectActivity extends Activity {
     addFavoriteButton = findViewById(R.id.add_favorite_button);
     addFavoriteButton.setOnClickListener(addFavoriteListener);
 
-    requestPermissions();
+    //requestPermissions();
   }
 
   @Override

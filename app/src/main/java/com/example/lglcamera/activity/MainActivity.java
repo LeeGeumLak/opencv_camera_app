@@ -270,14 +270,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                 // 알람리시버 intent 생성
                 final Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
-                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 
                 // 알람 설정이 되었을 때
                 if(isNotiChecked) {
                     // TODO : 서비스, 브로드캐스트 리시버 실행 기능 추가
                     // 리시버에 string 값 넘겨주기
                     alarmIntent.putExtra("state", "alarm on");
+
+                    pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 
                     // 알람 설정
                     long triggerTime = SystemClock.elapsedRealtime() + 1000*60; // 1분
@@ -293,12 +294,14 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     // 리시버에 string 값 넘겨주기
                     alarmIntent.putExtra("state", "alarm off");
 
+                    pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+
                     // 알람 설정 해제
                     alarmManager.cancel(pendingIntent);
-
-                    if(pendingIntent != null) {
+                    /*if(pendingIntent != null) {
                         alarmManager.cancel(pendingIntent);
-                    }
+                    }*/
                     sendBroadcast(alarmIntent);
 
                     Toast.makeText(MainActivity.this, "알람 설정이 해제되었습니다.", Toast.LENGTH_SHORT).show();
