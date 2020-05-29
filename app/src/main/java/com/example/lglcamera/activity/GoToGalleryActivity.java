@@ -15,6 +15,7 @@ public class GoToGalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_go_to_gallery);
 
+        // viewpager : 데이터를 페이지 단위로 표시, flip 하여 페이지를 전환하게 하는 컨테이너
         ViewPager vpGallery = (ViewPager)findViewById(R.id.vpGallery);
         VpGalleryAdapter vpGalleryAdapter = new VpGalleryAdapter(this, Environment.getExternalStorageDirectory() + "/Images/");
         vpGallery.setAdapter(vpGalleryAdapter);

@@ -24,12 +24,9 @@ public class LoadingActivity extends Activity {
         /*try {
             //Lottie Animation start
             animationView.playAnimation();
-
             //Thread.sleep(5000); //대기 초 설정(5초)
             //startActivity(main_intent);
-
             //finish();
-
         } catch (Exception e) {
             Log.e(TAG, "LoadingActivity ERROR", e);
         }*/
