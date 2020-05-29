@@ -13,13 +13,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         this.context = context;
 
         // intent 로부터 전달받은 string
-        String get_yout_string = intent.getExtras().getString("state");
+        String get_string = intent.getExtras().getString("state");
 
         // service intent 생성
         Intent service_intent = new Intent(context, AlarmService.class);
 
         // service로 string값 보내기
-        service_intent.putExtra("state", get_yout_string);
+        service_intent.putExtra("state", get_string);
 
         // start the service
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){

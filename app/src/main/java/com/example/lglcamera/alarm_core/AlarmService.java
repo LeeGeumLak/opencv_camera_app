@@ -20,6 +20,9 @@ import com.example.lglcamera.activity.MainActivity;
 
 public class AlarmService extends Service {
     private NotificationManager notificationManager;
+    private Notification notification;
+    private PendingIntent pendingIntent;
+    private int startId;
 
     @Nullable
     @Override
@@ -31,7 +34,7 @@ public class AlarmService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+        pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(getApplicationContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (Build.VERSION.SDK_INT >= 26) {
@@ -41,7 +44,7 @@ public class AlarmService extends Service {
             notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
             notificationManager.createNotificationChannel(channel);
 
-            Notification notification = new NotificationCompat.Builder(this, "default")
+            notification = new NotificationCompat.Builder(this, "default")
                     .setContentTitle("LGL Camera")
                     .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
                     .setSmallIcon(R.mipmap.ic_launcher)
@@ -50,7 +53,7 @@ public class AlarmService extends Service {
                     .build();
 
             //notificationManager.notify(1, notification);
-            startForeground(1, notification);
+            //startForeground(1, notification);
         }
     }
 
@@ -62,9 +65,14 @@ public class AlarmService extends Service {
 
         assert getState != null;
         switch (getState) {
+            case "alarm on":
+                startForeground(1, notification);
+                break;
             case "alarm off":
-                this.stopForeground(true);
-                notificationManager.cancel(1);
+                /*this.stopForeground(true);
+                notificationManager.cancel(1);*/
+                onDestroy();
+
                 break;
             default:
                 break;
@@ -114,6 +122,7 @@ public class AlarmService extends Service {
 
     @Override
     public void onDestroy() {
+        // 서비스 파괴
         super.onDestroy();
     }
 }

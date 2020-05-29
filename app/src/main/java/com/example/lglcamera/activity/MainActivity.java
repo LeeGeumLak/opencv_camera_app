@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public native void ConvertRGBtoGray(long mat_addr_input, long mat_addr_result);
     public native void ConvertRGBtoHSV(long mat_addr_input, long mat_addr_result);
     public native long LoadCascade(String cascadeFileName );
-    public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
+    //public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
     public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_result, long mat_addr_sunglasses ,long cascadeClassifier_face, long cascadeClassifier_eye);
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
@@ -281,11 +281,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 
                     // 알람 설정
-                    long triggerTime = SystemClock.elapsedRealtime() + 1000*60; // 1분
-                    alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, triggerTime, 1000*60, pendingIntent);
+                    long triggerTime = System.currentTimeMillis() + 1000*60; // 현재시간 + 1분
+                    alarmManager.setRepeating(AlarmManager.RTC, triggerTime, 1000*60, pendingIntent);
 
                     Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 }
+                // 알람 취소했을 때
                 else {
                     // dummpy intent
                     //Intent tempIntent = new Intent();
@@ -483,6 +484,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             else if(ret_str.equals("no")) ret = false;
         }
     }*/
+
+
 
     // 필터 버튼 클릭시, 애니메이션 이벤트
     private void toggleFilterBtn() {
