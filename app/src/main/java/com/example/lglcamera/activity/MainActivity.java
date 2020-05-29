@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private static final String TAG = "MainActivity";
 
     // 액티비티 내 버튼, 텍스트뷰, 스위치 버튼
-    private Button Button_RGB, Button_Gray, Button_HSV, Button_text, Button_capture, Button_sticker;
-    private Button Button_settings, Button_webRtc, Button_change, Button_filter, Button_gallery;
+    private Button Button_filter, Button_RGB, Button_Gray, Button_HSV, Button_text, Button_sticker;
+    private Button Button_capture, Button_gallery, Button_settings, Button_webRtc, Button_change;
     private TextView Textview_webRtc;
     private Switch Switch_notification;
 
@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         alarmSp = getSharedPreferences("alarmFile", MODE_PRIVATE);
         isNotiChecked = alarmSp.getBoolean("alarmOnOff", false);
 
+        // UI 에 있는 버튼, 텍스트뷰, 스위치버튼 등의 findviewbyid 와 리스너 설정
         init();
 
         // xml 파일 읽어와 객체 로드
@@ -485,8 +486,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
     }*/
 
-
-
     // 필터 버튼 클릭시, 애니메이션 이벤트
     private void toggleFilterBtn() {
         if(isFilterBtnOpen) {
@@ -688,18 +687,23 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                 // 얼굴 검출 후, 선글라스 씌우기
                 Mat matSunglasses = new Mat();
+
+                // asset 폴더에 있는 선글라스 이미지를 가져오기 위해 AssetManager를 사용
                 AssetManager assetManager = getAssets();
                 BufferedInputStream buf;
                 try {
+                    // inputstream과 assetmanager를 이용하여, 선글라스 이미지를 가져오고, bitmap 형식으로 변환
                     buf = new BufferedInputStream(assetManager.open("sunglasses_black.png"));
                     Bitmap bitmap = BitmapFactory.decodeStream(buf);
 
+                    // bitmap 형식의 선글라스 이미지를 mat 형식으로 변환 --> native cpp 파일에 인자로 넘겨주기 위함
                     Utils.bitmapToMat(bitmap, matSunglasses);
 
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
 
+                // 얼굴과 얼굴 안의 눈을 인식하고, 인식한 얼굴 위에 선글라스를 씌우기 위한 메서드
                 DetectAndSunglasses( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), matSunglasses.getNativeObjAddr() ,cascadeClassifier_face, cascadeClassifier_eye);
             }
 
