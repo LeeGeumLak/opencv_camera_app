@@ -21,6 +21,8 @@ float imgResize(Mat img_src, Mat &img_resize, int resize_width){
 //void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location);
 
+// 메인 액티비티에서 사용, 메인 액티비티에서 인자로 카메라로 들어오는 화면(mat_addr_input)과 화면으로 내보내는 화면(mat_addr_result), 얼굴위에 씌울 선글라스 이미지(mat_addr_sunglasses),
+// 그리고 얼굴과 눈을 인식하는 cascade 파일을 받는다.
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env, jobject type, jlong mat_addr_input, jlong mat_addr_result, jlong mat_addr_sunglasses,
@@ -30,16 +32,21 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "DetectAndSunglasses 진입 %d", 1);
 
+    // long 타입으로 받은 선글라스 이미지를 Mat 타입으로 캐스팅
     Mat &glasses = *(Mat *) mat_addr_sunglasses;
     //String glassesName = "sunglasses_black.png";
     //glasses = imread(glassesName, IMREAD_UNCHANGED);
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","선글라스 이미지 받아옴 %d", 1);
 
+    // long 타입으로 받은 input과 output 화면을 Mat 타입으로 캐스팅
     Mat &img_input = *(Mat *) mat_addr_input;
     Mat &img_result = *(Mat *) mat_addr_result;
+
+    // img_result는 null 상태이므로 img_input 의 정보를 복제
     img_result = img_input.clone();
 
+    // 원본에 영향을 주지 않고, 영상처리를 하기 위해 output2 생성, img_input 의 내용을 복사함
     Mat output2;
     img_input.copyTo(output2);
 
@@ -59,6 +66,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","cvt 직전 %d", 1);
 
+    // 히스토그램 평활화를 위해 img_input 화면을 grayscale로 변환한다.
     Mat img_gray;
     cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
 
@@ -69,16 +77,20 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","cvt 직후 %d", 1);
 
     //Mat smallImg;
-    Mat img_resize;
     //double resizeRatio = imgResize(img_gray, img_resize, 640);
     //double fx = 1 / scale;
     //resize( img_gray, smallImg, Size(), fx, fx, INTER_LINEAR_EXACT );
+
+    // 위의 히스토그램 평활화까지 마친 이미지를 적당한 사이즈로 resize 함
+    Mat img_resize;
     resize( img_gray, img_resize, Size(), 1, 1, INTER_LINEAR_EXACT );
 
     //equalizeHist( smallImg, smallImg );
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","detectMultiScale 직전 %d", 1);
 
+    // 얼굴을 인식하게 하는 cascade 파일을 이용하여 화면속의 얼굴(들)을 인식하여, faces 벡터 컨테이너에 저장한다.
+    // vector : 대표적인 시퀀스 컨테이너로 배열과 비슷함(원소가 연속하게 저장됨)
     ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces,
                                                                       1.1, 2, 0
                                                                               //|CASCADE_FIND_BIGGEST_OBJECT
@@ -89,8 +101,10 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","얼굴 검출 for문 직전 %d", 1);
 
+    // 얼굴에 선글라스를 씌우는 overlayImage 메서드에 결과값으로 넘길 인자값
     Mat result;
-    //for ( int i = 0; i < faces.size(); i++ ) {
+
+    // 위에서 찾은 얼굴의 개수만큼 반복문 실행( faces.size() : 인식한 얼굴의 개수 )
     for ( size_t i = 0; i < faces.size(); i++ ) {
         // 찾은 얼굴의 x 값과 y 값 계산
         //double real_facesize_x = faces[i].x / resizeRatio;
@@ -100,8 +114,11 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
         //double real_facesize_width = faces[i].width / resizeRatio;
         //double real_facesize_height = faces[i].height / resizeRatio;
 
+        // 인식한 얼굴을 저장한 faces 벡터의 i 번째 인자값을 r 로 지정
         Rect r = faces[i];
         Mat faceROI; //smallImgROI;
+
+        // 인식할 눈의 위치를 저장할 벡터 컨테이너
         vector<Rect> eyes;
 
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","원 정의 직전 %d", 1);
@@ -114,8 +131,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
         //ellipse(img_result, center, Size(cvRound(real_facesize_width / 2), cvRound(real_facesize_height / 2)), 0, 0, 360, Scalar(255, 192, 0), 4, 8, 0);
 
+        // 얼굴의 너비와 높이의 비율을 이용하여, 인식한 얼굴에 원을 그림
         double aspect_ratio = (double)r.width/r.height;
-
         if( 0.75 < aspect_ratio && aspect_ratio < 1.3 ) {
             center.x = cvRound(r.x + r.width*0.5);
             center.y = cvRound(r.y + r.height*0.5);
@@ -145,6 +162,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈 detectMultiScale 직전 %d", 1);
 
+        // cascade 파일을 이용하여, 인식한 얼굴의 눈을 인식하여 eyes 벡터 컨테이너에 저장
         ((CascadeClassifier *) cascadeClassifier_eye)->detectMultiScale( faceROI, eyes,
                                                                          1.1, 2, 0
                                                                                  //|CASCADE_FIND_BIGGEST_OBJECT
@@ -157,12 +175,13 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈 검출 반복문 직전 %d", 1);
 
-        // eyes.size() : 검출한 눈의 개수
+        // eyes.size() : 검출한 눈의 개수, 인식한 눈의 개수만큼 반복문 실행
         for ( size_t j = 0; j < eyes.size(); j++ ) {
             //Point eye_center(cvRound(real_facesize_x + eyes[j].x + eyes[j].width/2), cvRound(real_facesize_y + eyes[j].y + eyes[j].height/2));
 
             //int radius = cvRound((eyes[j].width + eyes[j].height)*0.25);
 
+            // 인식한 눈의 좌표를 정의하고, 원을 그림
             Rect nr = eyes[j];
             center.x = cvRound((r.x + nr.x + nr.width*0.5));
             center.y = cvRound((r.y + nr.y + nr.height*0.5));
@@ -183,13 +202,14 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
             __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","눈에 circle 직후 %d", 1);
 
-            //push_back : vector의 끝에 요소를 추가
+            //push_back : vector의 끝에 요소를 추가, 각 얼굴마다의 1개 이상의 눈 위치(좌표)를 points에 저장
             Point p(center.x, center.y);
             points.push_back( p );
         }
 
         __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","points.size() ==2 직전 %d", 1);
 
+        // 인식한 눈이 2개일 때만( 1개만 인식될 때가 있는데, 그때는 예외처리함 --> 2개의 눈 모두 인식되어야 선글라스를 씌울 수 있음 )
         if ( points.size() == 2){
 
             __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","points.size() ==2 직후 %d", 1);
@@ -197,6 +217,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
             Point center1 = points[0]; // 눈 1
             Point center2 = points[1]; // 눈 2
 
+            // 두 눈의 x 좌표를 따져 화면상 왼쪽의 눈을 가려냄
             if ( center1.x > center2.x ) {
                 Point temp;
                 temp = center1;
@@ -204,7 +225,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
                 center2 = temp;
             }
 
-
+            // 두 눈의 사이의 거리를 인식
             int width = abs(center2.x - center1.x);
             int height = abs(center2.y - center1.y);
 
@@ -214,6 +235,8 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","width > height 직후 %d", 1);
 
+                // 두 눈의 사이의 거리에 따라 선글라스 이미지를 resize 하기 위해 그 크기값을 구함
+                // 선글라스를 얼마나 resize 할지의 크기 값
                 double imgScale = width/200.0;
 
                 int w, h;
@@ -232,23 +255,29 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndSunglasses(JNIEnv *env
                 // E/libc++abi: terminating with uncaught exception of type cv::Exception: OpenCV(4.3.0)
                 //                              /build/master_pack-android/opencv/modules/imgproc/src/resize.cpp:3929: error: (-215:Assertion failed) !ssize.empty() in function 'resize'
                 //resize( glasses, resized_glasses, Size( w, h), 0, 0);
+
+                // 인자로 받은 안경 이미지를 얼굴 크기에 맞게 resize 함
                 resize( glasses, resized_glasses, cv::Size( w, h), 0, 0 );
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직전 %d", 1);
 
+                // resize한 얼굴 이미지와 선글라스 이미지를 인자로 입력 --> 얼굴 위에 선글라스를 오버레이하여 result 이미지에 입력 (포인터를 이용하므로 따로 return 받지는 않음)
                 overlayImage(output2, resized_glasses, result, Point(center1.x-offsetX, center1.y-offsetY));
 
                 __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 직후 %d", 1);
 
+                // result 값을 output2에 복제
                 output2 = result.clone();
             }
         }
     }
+    // output2 값을 img_result에 복제 : 포인터를 이용하므로 img_result에 최종 이미지를 저장하면, 메인 액티비티에서 이 이미지를 사용할 수 있다.
     output2.copyTo(img_result);
 }
 
 // 선글라스 이미지 오버레이
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location) {
+    // background 값을 output에 복사 --> output 은 null 상태이므로, 미리 원본 사진을 넣어둠
     background.copyTo(output);
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 반복문 시작 직전", 1);
@@ -367,7 +396,7 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);
 
 }*/
-extern "C"
+/*extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_example_lglcamera_activity_PhotoPreviewActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
     const char *nativeFileNameString = env->GetStringUTFChars(cascadeFileName_, 0);
@@ -387,9 +416,8 @@ Java_com_example_lglcamera_activity_PhotoPreviewActivity_LoadCascade(JNIEnv *env
     //__android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "return %s", nativeFileNameString);
 
     return ret;
-}
+}*/
 
-// cascade file copy and load
 /*extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_example_lglcamera_FaceDetectionActivity_loadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
@@ -469,6 +497,8 @@ Java_com_example_lglcamera_FaceDetectionActivity_detect (JNIEnv *env, jobject ty
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);
 
 }*/
+
+// cascade file copy and load
 extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_example_lglcamera_activity_MainActivity_LoadCascade(JNIEnv *env, jobject type, jstring cascadeFileName_){
@@ -492,19 +522,12 @@ Java_com_example_lglcamera_activity_MainActivity_LoadCascade(JNIEnv *env, jobjec
 }
 
 // 얼굴을 인식하고, 각 얼굴마다의 눈 인식하여 원으로 표시
-extern "C"
+/*extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, jobject type, jlong cascadeClassifier_face,
                                                          jlong cascadeClassifier_eye, jlong mat_addr_Input, jlong mat_addr_Result) {
 
     //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 1);
-
-    //String glassesImage = "sunglasses.png";
-    //String glassesImage = "D:/A/teamnova_basic_project/basic_android_second_chance/teamnova_basic_project_android_1st/app/src/main/assets/sunglasses.png";
-//    bool tryflip = false;
-//    double scale;
-//    scale = 1;
-//    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
 
     Mat &img_input = *(Mat *) mat_addr_Input;
     Mat &img_result = *(Mat *) mat_addr_Result;
@@ -598,70 +621,39 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndDraw (JNIEnv *env, job
             // radius = 원의 반지름
             // Scalar = 원의 색깔 BRG 순서 / 해당 색의 원을 그려준다
             circle( img_result, eye_center, radius, Scalar( 89, 89, 89 ), 4, 8, 0 );
-
-            /*Mat &img_input = *(Mat *) mat_addr_Input;
-            Mat &img_result = *(Mat *) mat_addr_Result;
-
-            img_result = img_input;
-
-            String glassesImage = "sunglasses.png";
-            bool tryflip = false;
-            double scale;
-            scale = 1;
-
-            Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
-
-            CascadeClassifier cascade, nestedCascade;
-            cascade = *(CascadeClassifier *)cascadeClassifier_face;
-            nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
-
-            detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
         }
     }
-
-    //__android_log_print(ANDROID_LOG_DEBUG, (char *) "native-lib :: ","%d", 6);*/
-    /*Mat &img_input = *(Mat *) mat_addr_Input;
-    Mat &img_result = *(Mat *) mat_addr_Result;
-
-    img_result = img_input;
-
-    String glassesImage = "sunglasses.png";
-    bool tryflip = false;
-    double scale;
-    scale = 1;
-
-    Mat glasses = imread(glassesImage, IMREAD_UNCHANGED);
-
-    CascadeClassifier cascade, nestedCascade;
-    cascade = *(CascadeClassifier *)cascadeClassifier_face;
-    nestedCascade = *(CascadeClassifier *)cascadeClassifier_eye;
-
-    detectAndDraw(img_result, cascade, nestedCascade, scale, tryflip, glasses);*/
-}
+}*/
 
 // rgb -> gray
+// mat_addr_input 은 rgba 이미지, mat_addr_result 는 null 상태
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_activity_MainActivity_ConvertRGBtoGray(JNIEnv *env, jobject thiz,
                                                          jlong mat_addr_input,
                                                          jlong mat_addr_result) {
     // TODO: implement ConvertRGBtoGray()
+    // long 타입인 이미지 정보를 Mat 타입으로 캐스팅
     Mat &matInput = *(Mat *)mat_addr_input;
     Mat &matResult = *(Mat *)mat_addr_result;
 
+    // rgba 이미지인 matInput을 grayscale로 변환하여 matResult에 입력
     cvtColor(matInput, matResult, COLOR_RGBA2GRAY);
 }
 
 // rgb -> hsv
+// mat_addr_input 은 rgba 이미지, mat_addr_result 는 null 상태
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_lglcamera_activity_MainActivity_ConvertRGBtoHSV(JNIEnv *env, jobject thiz,
                                                          jlong mat_addr_input,
                                                          jlong mat_addr_result) {
     // TODO: implement ConvertRGBtoGray()
+    // long 타입인 이미지 정보를 Mat 타입으로 캐스팅
     Mat &matInput = *(Mat *)mat_addr_input;
     Mat &matResult = *(Mat *)mat_addr_result;
 
+    // rgba 이미지인 matInput을 hsv로 변환하여 matResult에 입력
     cvtColor(matInput, matResult, COLOR_RGB2HSV);
 }
 
