@@ -34,6 +34,32 @@ public class AlarmService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        //
+        /*long when = System.currentTimeMillis();
+        NotificationManager notificationManager = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent notificationIntent = new Intent(context, EVentsPerform.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
+                context).setSmallIcon(R.drawable.applogo)
+                .setContentTitle("Alarm Fired")
+                .setContentText("Events to be Performed").setSound(alarmSound)
+                .setAutoCancel(true).setWhen(when)
+                .setContentIntent(pendingIntent)
+                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
+        notificationManager.notify(MID, mNotifyBuilder.build());
+        MID++;*/
+        //
+
+        int MID = 1;
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(getApplicationContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -41,16 +67,28 @@ public class AlarmService extends Service {
             NotificationChannel channel = new NotificationChannel("default", "알람기능",
                     NotificationManager.IMPORTANCE_DEFAULT);
 
-            notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+            long when = System.currentTimeMillis();
+
+            notificationManager = ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE));
             notificationManager.createNotificationChannel(channel);
 
-            notification = new NotificationCompat.Builder(this, "default")
+            NotificationCompat.Builder notiBuilder = new NotificationCompat.Builder(getApplicationContext())
+                    .setContentTitle("LGL Camera")
+                    .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setAutoCancel(true).setWhen(when)
+                    .setContentIntent(pendingIntent);
+
+            notificationManager.notify(MID, notiBuilder.build());
+            MID++;
+
+            /*notification = new NotificationCompat.Builder(this, "default")
                     .setContentTitle("LGL Camera")
                     .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
-                    .build();
+                    .build();*/
 
             //notificationManager.notify(1, notification);
             //startForeground(1, notification);
@@ -66,7 +104,7 @@ public class AlarmService extends Service {
         assert getState != null;
         switch (getState) {
             case "alarm on":
-                startForeground(1, notification);
+                //startForeground(1, notification);
                 break;
             case "alarm off":
                 /*this.stopForeground(true);
