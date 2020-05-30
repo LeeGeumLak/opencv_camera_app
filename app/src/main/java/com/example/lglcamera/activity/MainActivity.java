@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import static android.Manifest.permission.CAMERA;
 import static android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
@@ -270,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 Switch_notification.setChecked(isNotiChecked);
 
                 // 알람리시버 intent 생성
-                final Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
+                Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
 
                 // 알람 설정이 되었을 때
                 if(isNotiChecked) {
@@ -279,11 +280,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     alarmIntent.putExtra("state", "alarm on");
 
                     pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+                    alarmManager = (AlarmManager)MainActivity.this.getSystemService(MainActivity.this.ALARM_SERVICE);
 
                     // 알람 설정
-                    long triggerTime = System.currentTimeMillis() + 1000*60; // 현재시간 + 1분
-                    alarmManager.setRepeating(AlarmManager.RTC, triggerTime, 1000*60, pendingIntent);
+                    long triggerTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1L); // 현재시간 + 1분
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 1000*60, pendingIntent);
 
                     Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 }
