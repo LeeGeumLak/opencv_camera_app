@@ -22,7 +22,10 @@ public class AlarmService extends Service {
     private NotificationManager notificationManager;
     private Notification notification;
     private PendingIntent pendingIntent;
+
+    private MediaPlayer mediaPlayer;
     private int startId;
+    private boolean isRunning;
 
     @Nullable
     @Override
@@ -35,7 +38,8 @@ public class AlarmService extends Service {
         super.onCreate();
 
         //
-        /*long when = System.currentTimeMillis();
+        /*
+long when = System.currentTimeMillis();
         NotificationManager notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -59,7 +63,6 @@ public class AlarmService extends Service {
         MID++;*/
         //
 
-        int MID = 1;
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(getApplicationContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -67,35 +70,25 @@ public class AlarmService extends Service {
             NotificationChannel channel = new NotificationChannel("default", "알람기능",
                     NotificationManager.IMPORTANCE_DEFAULT);
 
-            long when = System.currentTimeMillis();
+            //long when = System.currentTimeMillis();
 
             notificationManager = ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE));
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder notiBuilder = new NotificationCompat.Builder(getApplicationContext())
-                    .setContentTitle("LGL Camera")
-                    .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setAutoCancel(true).setWhen(when)
-                    .setContentIntent(pendingIntent);
-
-            notificationManager.notify(MID, notiBuilder.build());
-            MID++;
-
-            /*notification = new NotificationCompat.Builder(this, "default")
+            notification = new NotificationCompat.Builder(this, "default")
                     .setContentTitle("LGL Camera")
                     .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
-                    .build();*/
+                    .build();
 
             //notificationManager.notify(1, notification);
-            //startForeground(1, notification);
+            startForeground(1, notification);
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -104,21 +97,18 @@ public class AlarmService extends Service {
         assert getState != null;
         switch (getState) {
             case "alarm on":
-                //startForeground(1, notification);
+                startId = 1;
                 break;
             case "alarm off":
-                /*this.stopForeground(true);
-                notificationManager.cancel(1);*/
-                onDestroy();
-
+                startId = 0;
                 break;
             default:
+                startId = 0;
                 break;
         }
 
-        /*// 알람음 재생 X , 알람음 시작 클릭
+        // 알람음 재생 X , 알람음 시작 클릭
         if(!this.isRunning && startId == 1) {
-
             mediaPlayer = MediaPlayer.create(this,R.raw.alarm_sound);
             mediaPlayer.start();
 
@@ -128,33 +118,28 @@ public class AlarmService extends Service {
 
         // 알람음 재생 O , 알람음 종료 버튼 클릭
         else if(this.isRunning && startId == 0) {
-
             mediaPlayer.stop();
             mediaPlayer.reset();
             mediaPlayer.release();
 
             this.isRunning = false;
             this.startId = 0;
-
-            onDestroy();
         }
 
         // 알람음 재생 X , 알람음 종료 버튼 클릭
         else if(!this.isRunning && startId == 0) {
-
             this.isRunning = false;
             this.startId = 0;
 
-            onDestroy();
         }
 
         // 알람음 재생 O , 알람음 시작 버튼 클릭
         else if(this.isRunning && startId == 1){
-
             this.isRunning = true;
             this.startId = 1;
-        }*/
+        }
 
+        else { }
         return START_NOT_STICKY;
     }
 
@@ -164,3 +149,89 @@ public class AlarmService extends Service {
         super.onDestroy();
     }
 }
+/*
+import android.app.*;
+import android.content.*;
+import android.os.*;
+
+import androidx.core.app.NotificationCompat;
+
+import com.example.lglcamera.R;
+import com.example.lglcamera.activity.MainActivity;
+
+public class AlarmService extends Service {
+
+    private boolean isRunning;
+    private Context context;
+    private Thread backgroundThread;
+
+    private NotificationManager notificationManager;
+    private Notification notification;
+    private PendingIntent pendingIntent;
+    private int startId;
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+        this.context = this;
+        this.isRunning = false;
+        this.backgroundThread = new Thread(myTask);
+    }
+
+    private Runnable myTask = new Runnable() {
+        public void run() {
+            // Do something here
+            pendingIntent = PendingIntent.getActivity(AlarmService.this, 0,
+                    new Intent(getApplicationContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+            if (Build.VERSION.SDK_INT >= 26) {
+                NotificationChannel channel = new NotificationChannel("default", "알람기능",
+                        NotificationManager.IMPORTANCE_DEFAULT);
+
+                //long when = System.currentTimeMillis();
+
+                notificationManager = ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE));
+                notificationManager.createNotificationChannel(channel);
+
+                notification = new NotificationCompat.Builder(AlarmService.this, "default")
+                        .setContentTitle("LGL Camera")
+                        .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setAutoCancel(true)
+                        .setContentIntent(pendingIntent)
+                        .build();
+
+                //notificationManager.notify(1, notification);
+                startForeground(1, notification);
+            }
+
+            stopSelf();
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        this.isRunning = false;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        isRunning = intent.getExtras().getBoolean("state");
+
+        if(!this.isRunning) {
+            this.isRunning = true;
+            this.backgroundThread.start();
+        }
+        else {
+            this.isRunning = false;
+            this.backgroundThread.stop();
+        }
+
+        return START_STICKY;
+    }
+
+}*/

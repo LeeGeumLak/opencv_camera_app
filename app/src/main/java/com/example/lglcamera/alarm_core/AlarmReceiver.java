@@ -30,3 +30,26 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
     }
 }
+
+/*
+import android.app.*;
+import android.content.*;
+import android.os.*;
+
+public class AlarmReceiver extends BroadcastReceiver {
+    private Context context;
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Intent service_intent = new Intent(context, AlarmService.class);
+        // start the service
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+            this.context.startForegroundService(service_intent);
+        }
+        else {
+            this.context.startService(service_intent);
+        }
+        //context.startService(background);
+    }
+
+}*/

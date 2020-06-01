@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -270,8 +271,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 isNotiChecked = isChecked;
                 Switch_notification.setChecked(isNotiChecked);
 
+                // Calendar 객체 생성 , 현재시간 받아오기
+                final Calendar calendar = Calendar.getInstance();
+
                 // 알람리시버 intent 생성
-                Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
+                final Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
 
                 // 알람 설정이 되었을 때
                 if(isNotiChecked) {
@@ -279,32 +283,36 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     // 리시버에 string 값 넘겨주기
                     alarmIntent.putExtra("state", "alarm on");
 
+                    // calendar에 시간 셋팅
+                    /*calendar.set(Calendar.HOUR_OF_DAY, alarm_timepicker.getHour());
+                    calendar.set(Calendar.MINUTE, alarm_timepicker.getMinute());*/
+
                     pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager = (AlarmManager)MainActivity.this.getSystemService(MainActivity.this.ALARM_SERVICE);
+
+                    pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
+                    alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
                     // 알람 설정
-                    long triggerTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1L); // 현재시간 + 1분
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 1000*60, pendingIntent);
+                    long triggerTime = calendar.getTimeInMillis() + 1000*30; // 현재시간 + 30초
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 1000*30, pendingIntent); // 30초 마다 alarm repeat
 
                     Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 }
                 // 알람 취소했을 때
                 else {
-                    // dummpy intent
-                    //Intent tempIntent = new Intent();
-
                     // TODO : 서비스, 브로드캐스트 리시버 실행 멈춤 기능 추가
+                    // 알람 설정 해제
+                    alarmManager.cancel(pendingIntent);
+
                     // 리시버에 string 값 넘겨주기
                     alarmIntent.putExtra("state", "alarm off");
 
-                    pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-
-                    // 알람 설정 해제
-                    alarmManager.cancel(pendingIntent);
+                    /*pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);*/
                     /*if(pendingIntent != null) {
                         alarmManager.cancel(pendingIntent);
                     }*/
+                    // 알람 취소
                     sendBroadcast(alarmIntent);
 
                     Toast.makeText(MainActivity.this, "알람 설정이 해제되었습니다.", Toast.LENGTH_SHORT).show();
