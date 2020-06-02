@@ -20,6 +20,7 @@ float imgResize(Mat img_src, Mat &img_resize, int resize_width){
 
 //void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location);
+Mat putMask( Mat src, Mat mask, Point center, Size face_size );
 
 // 메인 액티비티에서 사용, 메인 액티비티에서 인자로 카메라로 들어오는 화면(mat_addr_input)과 화면으로 내보내는 화면(mat_addr_result), 얼굴위에 씌울 선글라스 이미지(mat_addr_sunglasses),
 // 그리고 얼굴과 눈을 인식하는 cascade 파일을 받는다.
@@ -315,6 +316,137 @@ void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Poi
     }
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","오버레이 반복문 끝 직후", 1);
 }
+
+// 메인 액티비티에서 사용, 메인 액티비티에서 인자로 카메라로 들어오는 화면(mat_addr_input)과 화면으로 내보내는 화면(mat_addr_result), 얼굴위에 씌울 마스크 이미지(mat_addr_sunglasses),
+// 그리고 얼굴을 인식하는 cascade 파일을 받는다.
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_lglcamera_activity_MainActivity_DetectAndMask(JNIEnv *env, jobject type, jlong mat_addr_input, jlong mat_addr_result, jlong mat_addr_mask,
+                                                                     jlong cascadeClassifier_face) {
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ", "DetectAndMask 진입 %d", 1);
+
+    // long 타입으로 받은 선글라스 이미지를 Mat 타입으로 캐스팅
+    Mat &mask = *(Mat *) mat_addr_mask;
+
+    // long 타입으로 받은 input과 output 화면을 Mat 타입으로 캐스팅
+    Mat &img_input = *(Mat *) mat_addr_input;
+    Mat &img_result = *(Mat *) mat_addr_result;
+
+    // img_result는 null 상태이므로 img_input 의 정보를 복제
+    img_result = img_input.clone();
+
+    // 원본에 영향을 주지 않고, 영상처리를 하기 위해 output2 생성, img_input 의 내용을 복사함
+    Mat output2;
+    img_input.copyTo(output2);
+
+    vector<Rect> faces;//, faces2; // 탐지한 얼굴 정보(위치) 저장, faces2
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","cvt 직전 %d", 1);
+
+    // 히스토그램 평활화를 위해 img_input 화면을 grayscale로 변환한다.
+    Mat img_gray;
+    cvtColor(img_input, img_gray, COLOR_BGR2GRAY);
+
+    // 히스토그램 평활화 equalizeHist(원본 영상, 히스토그램 평활화가 저장될 Mat 이름)
+    // 원본 영상을 gray-scale로 변환 후, 한쪽으로 치우칠 수 있는 명암을 고르게 분포시켜주는 작업
+    equalizeHist( img_gray, img_gray );
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","cvt 직후 %d", 1);
+
+    // 위의 히스토그램 평활화까지 마친 이미지를 적당한 사이즈로 resize 함
+    Mat img_resize;
+    resize( img_gray, img_resize, Size(), 1, 1, INTER_LINEAR_EXACT );
+
+    //equalizeHist( smallImg, smallImg );
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","detectMultiScale 직전 %d", 1);
+
+    // 얼굴을 인식하게 하는 cascade 파일을 이용하여 화면속의 얼굴(들)을 인식하여, faces 벡터 컨테이너에 저장한다.
+    // vector : 대표적인 시퀀스 컨테이너로 배열과 비슷함(원소가 연속하게 저장됨)
+    ((CascadeClassifier *) cascadeClassifier_face)->detectMultiScale( img_resize, faces,
+                                                                      1.1, 3, 0
+                                                                              //|CASCADE_FIND_BIGGEST_OBJECT
+                                                                              //|CASCADE_DO_ROUGH_SEARCH
+                                                                              //|CASCADE_DO_CANNY_PRUNING
+                                                                              |CASCADE_SCALE_IMAGE,
+                                                                      Size(30, 30) );
+
+    __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","얼굴 검출 for문 직전 %d", 1);
+
+    // 얼굴에 마스크를 씌우는 메서드에 넘길 인자값
+    Mat image = img_input;
+
+    // 위에서 찾은 얼굴의 개수만큼 반복문 실행( faces.size() : 인식한 얼굴의 개수 )
+    for ( size_t i = 0; i < faces.size(); i++ ) {
+
+        /*// 인식한 얼굴을 저장한 faces 벡터의 i 번째 인자값을 r 로 지정
+        Rect r = faces[i];
+        Mat faceROI; //smallImgROI;
+
+        __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","원 정의 직전 %d", 1);
+
+        // 원 정의
+        Point center;
+        int radius;
+
+        // 얼굴의 너비와 높이의 비율을 이용하여, 인식한 얼굴에 원을 그림
+        double aspect_ratio = (double)r.width/r.height;
+        if( 0.75 < aspect_ratio && aspect_ratio < 1.3 ) {
+            center.x = cvRound(r.x + r.width*0.5);
+            center.y = cvRound(r.y + r.height*0.5);
+            radius = cvRound((r.width + r.height)*0.25);
+            circle( img_result, center, radius, Scalar(255, 192, 0), 4, 8, 0 );
+        }
+        else {
+            rectangle( img_result, Point(cvRound(r.x), cvRound(r.y)),
+                       Point(cvRound((r.x + r.width-1)), cvRound((r.y + r.height-1))), Scalar(255, 192, 0), 4, 8, 0);
+        }*/
+        double min_face_size = faces[i].width * 0.7;
+        double max_face_size = faces[i].width * 1.5;
+        Point center( faces[i].x + faces[i].width * 0.5, faces[i].y + faces[i].height * 0.5 );
+        output2 = putMask(image, mask, center, Size( faces[i].width, faces[i].height ) );
+
+    }
+
+    // output2 값을 img_result에 복제 : 포인터를 이용하므로 img_result에 최종 이미지를 저장하면, 메인 액티비티에서 이 이미지를 사용할 수 있다.
+    output2.copyTo(img_result);
+}
+
+Mat putMask( Mat src, Mat mask, Point center, Size face_size ) {
+    Mat mask1, src1;
+    resize( mask, mask1, face_size );
+
+    /// ROI selection
+    Rect roi( center.x - face_size.width / 2, center.y - face_size.width / 2, face_size.width, face_size.width );
+    src(roi).copyTo(src1);
+
+    /// to make the white region transparent
+    Mat mask2, m, m1;
+    cvtColor( mask1, mask2, COLOR_BGR2GRAY );
+    threshold( mask2, mask2, 230, 255, THRESH_BINARY_INV );
+
+    vector<Mat> maskChannels( 3 ), result_mask( 3 );
+    split( mask1, maskChannels );
+    bitwise_and( maskChannels[0], mask2, result_mask[0] );
+    bitwise_and( maskChannels[1], mask2, result_mask[1] );
+    bitwise_and( maskChannels[2], mask2, result_mask[2] );
+    merge( result_mask, m );
+
+    mask2 = 255 - mask2;
+    vector<Mat> srcChannels( 3 );
+    split(src1, srcChannels);
+    bitwise_and( srcChannels[0], mask2, result_mask[0] );
+    bitwise_and( srcChannels[1], mask2, result_mask[1] );
+    bitwise_and( srcChannels[2], mask2, result_mask[2] );
+    merge( result_mask, m1 );
+
+    addWeighted( m, 1, m1, 1, 0, m1);
+    m1.copyTo( src( roi ) );
+
+    return src;
+}
+
 
 // cascade file copy and load
 /*extern "C"

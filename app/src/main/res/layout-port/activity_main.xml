@@ -112,11 +112,11 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginStart="247dp"
+        android:layout_marginStart="257dp"
         android:layout_marginTop="497dp"
         android:layout_marginEnd="87dp"
         android:layout_marginRight="87dp"
-        android:background="@drawable/mask"
+        android:background="@drawable/cool"
         android:visibility="invisible" />
 
     <Button

@@ -42,7 +42,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="181dp"
         android:layout_marginRight="183dp"
-        android:background="@drawable/mask"
+        android:background="@drawable/cool"
         android:visibility="invisible" />
 
     <Button

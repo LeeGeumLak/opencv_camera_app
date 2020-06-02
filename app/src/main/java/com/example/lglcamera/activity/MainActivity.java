@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private static final String TAG = "MainActivity";
 
     // 액티비티 내 버튼, 텍스트뷰, 스위치 버튼
-    private Button Button_filter, Button_RGB, Button_Gray, Button_HSV, Button_text, Button_sticker;
+    private Button Button_filter, Button_RGB, Button_Gray, Button_HSV, Button_text, Button_sticker, Button_sunglasses, Button_mask;
     private Button Button_capture, Button_gallery, Button_settings, Button_webRtc, Button_change;
     private TextView Textview_webRtc;
     private Switch Switch_notification;
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private Mat matInput, matResult;
 
     // 카메라 필터 관련 변수
-    private int GrayScale, RGBA, HSV, sticker;
+    private int GrayScale, RGBA, HSV, stickerSunglasses, stickerMask;
 
     // 카메라 상태
     private int cameraId = 0;
@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public native long LoadCascade(String cascadeFileName );
     //public native void DetectAndDraw(long cascadeClassifier_face, long cascadeClassifier_eye, long mat_addr_input, long mat_addr_result);
     public native void DetectAndSunglasses(long mat_addr_input, long mat_addr_result, long mat_addr_sunglasses ,long cascadeClassifier_face, long cascadeClassifier_eye);
+    public native void DetectAndMask(long mat_addr_input, long mat_addr_result, long mat_addr_mask ,long cascadeClassifier_face);
+
     //CascadeClassifier& cascade, CascadeClassifier& nestedCascade == long cascadeClassifier_face, long cascadeClassifier_eye
 
     public long cascadeClassifier_face = 0;
@@ -265,7 +267,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_Gray = findViewById(R.id.Button_Gray);
         Button_HSV = findViewById(R.id.Button_HSV);
         Button_text = findViewById(R.id.Button_Text);
+
         Button_sticker = findViewById(R.id.Button_Sticker);
+        Button_sunglasses = findViewById(R.id.Button_sunglasses);
+        Button_mask = findViewById(R.id.Button_mask);
 
         Button_capture = findViewById(R.id.Button_capture);
         Button_change = findViewById(R.id.Button_change);
@@ -379,7 +384,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 RGBA = 1;
                 GrayScale = 0;
                 HSV  = 0;
-                sticker = 0;
+                stickerSunglasses = 0;
+                stickerMask = 0;
             }
         });
 
@@ -389,7 +395,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 RGBA = 0;
                 GrayScale = 0;
                 HSV  = 1;
-                sticker = 0;
+                stickerSunglasses = 0;
+                stickerMask = 0;
             }
         });
 
@@ -399,7 +406,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 RGBA = 0;
                 GrayScale = 1;
                 HSV  = 0;
-                sticker = 0;
+                stickerSunglasses = 0;
+                stickerMask = 0;
             }
         });
 
@@ -415,13 +423,32 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Button_sticker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RGBA = 0;
-                GrayScale = 0;
-                HSV  = 0;
-                sticker = 1;
+                toggleStickerBtn();
 
                 /*Intent faceDetectionIntent = new Intent(MainActivity.this, FaceDetectionActivity.class);
                 startActivity(faceDetectionIntent);*/
+            }
+        });
+
+        Button_sunglasses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RGBA = 0;
+                GrayScale = 0;
+                HSV  = 0;
+                stickerSunglasses = 1;
+                stickerMask = 0;
+            }
+        });
+
+        Button_mask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RGBA = 0;
+                GrayScale = 0;
+                HSV  = 0;
+                stickerSunglasses = 0;
+                stickerMask = 1;
             }
         });
 
@@ -574,19 +601,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
     }
 
-    // 스티ㅓ 버튼 클릭시, 애니메이션 이벤트
+    // 스티커 버튼 클릭시, 애니메이션 이벤트
     private void toggleStickerBtn() {
         if(isStickerBtnOpen) {
-            Button_webRtc.startAnimation(btnClose);
-            Textview_webRtc.startAnimation(btnClose);
-            Switch_notification.startAnimation(btnClose);
-            isSettingsBtnOpen = false;
+            Button_sunglasses.startAnimation(btnClose);
+            Button_mask.startAnimation(btnClose);
+            isStickerBtnOpen = false;
         }
         else {
-            Button_webRtc.startAnimation(btnOpen);
-            Textview_webRtc.startAnimation(btnOpen);
-            Switch_notification.startAnimation(btnOpen);
-            isSettingsBtnOpen = true;
+            Button_sunglasses.startAnimation(btnOpen);
+            Button_mask.startAnimation(btnOpen);
+            isStickerBtnOpen = true;
         }
     }
 
@@ -745,7 +770,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             if(HSV == 1) {
                 ConvertRGBtoHSV(matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
             }
-            if(sticker == 1) {
+            if(stickerSunglasses == 1) {
                 // 얼굴 검출
                 //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
 
@@ -757,7 +782,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 BufferedInputStream buf;
                 try {
                     // inputstream과 assetmanager를 이용하여, 선글라스 이미지를 가져오고, bitmap 형식으로 변환
-                    buf = new BufferedInputStream(assetManager.open("sunglasses_black.png"));
+                    buf = new BufferedInputStream(assetManager.open("sunglasses.png"));
                     Bitmap bitmap = BitmapFactory.decodeStream(buf);
 
                     // bitmap 형식의 선글라스 이미지를 mat 형식으로 변환 --> native cpp 파일에 인자로 넘겨주기 위함
@@ -769,6 +794,31 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
                 // 얼굴과 얼굴 안의 눈을 인식하고, 인식한 얼굴 위에 선글라스를 씌우기 위한 메서드
                 DetectAndSunglasses( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), matSunglasses.getNativeObjAddr() ,cascadeClassifier_face, cascadeClassifier_eye);
+            }
+            if(stickerMask == 1) {
+                // 얼굴 검출
+                //DetectAndDraw(cascadeClassifier_face,cascadeClassifier_eye, matInput.getNativeObjAddr(), matResult.getNativeObjAddr());
+
+                // 얼굴 검출 후, 마스크 씌우기
+                Mat matMask = new Mat();
+
+                // asset 폴더에 있는 마스크 이미지를 가져오기 위해 AssetManager를 사용
+                AssetManager assetManager = getAssets();
+                BufferedInputStream buf;
+                try {
+                    // inputstream과 assetmanager를 이용하여, 마스크 이미지를 가져오고, bitmap 형식으로 변환
+                    buf = new BufferedInputStream(assetManager.open("cool.png"));
+                    Bitmap bitmap = BitmapFactory.decodeStream(buf);
+
+                    // bitmap 형식의 마스크 이미지를 mat 형식으로 변환 --> native cpp 파일에 인자로 넘겨주기 위함
+                    Utils.bitmapToMat(bitmap, matMask);
+
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+                // 얼굴을 인식하고, 그 위에 마스크를 씌우기 위한 메서드
+                DetectAndMask( matInput.getNativeObjAddr(), matResult.getNativeObjAddr(), matMask.getNativeObjAddr() ,cascadeClassifier_face);
             }
 
             // 보류 : 회면 돌아가는거 예외처리 작업
