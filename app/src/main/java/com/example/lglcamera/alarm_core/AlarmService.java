@@ -1,4 +1,5 @@
 package com.example.lglcamera.alarm_core;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,25 +10,25 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.IBinder;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
+import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import com.example.lglcamera.R;
 import com.example.lglcamera.activity.MainActivity;
+
+import java.util.Calendar;
 
 
 public class AlarmService extends Service {
     private NotificationManager notificationManager;
     private Notification notification;
     private PendingIntent pendingIntent;
+    private AlarmManager alarmManager;
 
-    private MediaPlayer mediaPlayer;
+    /*private MediaPlayer mediaPlayer;
     private int startId;
-    private boolean isRunning;
+    private boolean isRunning;*/
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -74,17 +75,6 @@ long when = System.currentTimeMillis();
 
             notificationManager = ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE));
             notificationManager.createNotificationChannel(channel);
-
-            notification = new NotificationCompat.Builder(this, "default")
-                    .setContentTitle("LGL Camera")
-                    .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent)
-                    .build();
-
-            //notificationManager.notify(1, notification);
-            startForeground(1, notification);
         }
     }
 
@@ -97,19 +87,49 @@ long when = System.currentTimeMillis();
         assert getState != null;
         switch (getState) {
             case "alarm on":
-                startId = 1;
+                //startId = 1;
+
+                notification = new NotificationCompat.Builder(this, "default")
+                        .setContentTitle("LGL Camera")
+                        .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setAutoCancel(true)
+                        .setContentIntent(pendingIntent)
+                        .build();
+
+                //notificationManager.notify(1, notification);
+                Log.e("AlarmService", "startForeground 실행");
+                startForeground(1, notification);
+
+                /*// Calendar 객체 생성 , 현재시간 받아오기
+                final Calendar calendar = Calendar.getInstance();
+
+                //pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
+
+                alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+                // 알람 설정
+                //long triggerTime = calendar.getTimeInMillis() + 1000*30; // 현재시간 + 30초
+                //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 1000*30, pendingIntent); // 30초 마다 alarm repeat
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000 * 30), 1000*30 ,pendingIntent); // 30초 마다 alarm repeat*/
                 break;
             case "alarm off":
-                startId = 0;
+                //startId = 0;
+                //alarmManager.cancel(pendingIntent);
+
+                // 서비스를 멈추고, 파기함
+                stopSelf();
+                onDestroy();
+
                 break;
             default:
-                startId = 0;
+                //startId = 0;
                 break;
         }
 
         // 알람음 재생 X , 알람음 시작 클릭
-        if(!this.isRunning && startId == 1) {
-            mediaPlayer = MediaPlayer.create(this,R.raw.alarm_sound);
+        /*if(!this.isRunning && startId == 1) {
+            mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound);
             mediaPlayer.start();
 
             this.isRunning = true;
@@ -139,7 +159,8 @@ long when = System.currentTimeMillis();
             this.startId = 1;
         }
 
-        else { }
+        else { }*/
+
         return START_NOT_STICKY;
     }
 
