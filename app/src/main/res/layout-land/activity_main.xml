@@ -17,6 +17,35 @@
         android:visibility="gone"/>
 
     <Button
+        android:id="@+id/Button_sunglasses"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="489dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="181dp"
+        android:layout_marginRight="181dp"
+        android:background="@drawable/sunglasses"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/Button_mask"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/Button_sunglasses"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="489dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="181dp"
+        android:layout_marginRight="183dp"
+        android:background="@drawable/mask"
+        android:visibility="invisible" />
+
+    <Button
         android:id="@+id/Button_Sticker"
         android:layout_width="60dp"
         android:layout_height="60dp"

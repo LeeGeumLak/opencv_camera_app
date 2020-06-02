@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private Animation btnOpen, btnClose;
     private boolean isFilterBtnOpen = false;
     private boolean isSettingsBtnOpen = false;
+    private boolean isStickerBtnOpen = false;
 
     private CameraBridgeViewBase openCvCameraView;
 
@@ -566,6 +567,22 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
         else {
             Button_settings.setBackgroundResource(R.drawable.settings_pressed);
+            Button_webRtc.startAnimation(btnOpen);
+            Textview_webRtc.startAnimation(btnOpen);
+            Switch_notification.startAnimation(btnOpen);
+            isSettingsBtnOpen = true;
+        }
+    }
+
+    // 스티ㅓ 버튼 클릭시, 애니메이션 이벤트
+    private void toggleStickerBtn() {
+        if(isStickerBtnOpen) {
+            Button_webRtc.startAnimation(btnClose);
+            Textview_webRtc.startAnimation(btnClose);
+            Switch_notification.startAnimation(btnClose);
+            isSettingsBtnOpen = false;
+        }
+        else {
             Button_webRtc.startAnimation(btnOpen);
             Textview_webRtc.startAnimation(btnOpen);
             Switch_notification.startAnimation(btnOpen);
