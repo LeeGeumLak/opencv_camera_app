@@ -20,7 +20,7 @@ float imgResize(Mat img_src, Mat &img_resize, int resize_width){
 
 //void detectAndSunglasses( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip, Mat glasses );
 void overlayImage(const Mat &background, const Mat &foreground, Mat &output, Point2i location);
-Mat putMask( Mat src, Mat mask, Point center, Size face_size );
+//Mat putMask( Mat src, Mat mask, Point center, Size face_size );
 
 // 메인 액티비티에서 사용, 메인 액티비티에서 인자로 카메라로 들어오는 화면(mat_addr_input)과 화면으로 내보내는 화면(mat_addr_result), 얼굴위에 씌울 선글라스 이미지(mat_addr_sunglasses),
 // 그리고 얼굴과 눈을 인식하는 cascade 파일을 받는다.
@@ -328,6 +328,7 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndMask(JNIEnv *env, jobj
 
     // long 타입으로 받은 선글라스 이미지를 Mat 타입으로 캐스팅
     Mat &mask = *(Mat *) mat_addr_mask;
+    Mat resized_mask;
 
     // long 타입으로 받은 input과 output 화면을 Mat 타입으로 캐스팅
     Mat &img_input = *(Mat *) mat_addr_input;
@@ -374,13 +375,11 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndMask(JNIEnv *env, jobj
 
     __android_log_print(ANDROID_LOG_DEBUG, "native-lib :: ","얼굴 검출 for문 직전 %d", 1);
 
-    // 얼굴에 마스크를 씌우는 메서드에 넘길 인자값
-    Mat image = img_input;
-
+    Mat result;
     // 위에서 찾은 얼굴의 개수만큼 반복문 실행( faces.size() : 인식한 얼굴의 개수 )
     for ( size_t i = 0; i < faces.size(); i++ ) {
 
-        /*// 인식한 얼굴을 저장한 faces 벡터의 i 번째 인자값을 r 로 지정
+        // 인식한 얼굴을 저장한 faces 벡터의 i 번째 인자값을 r 로 지정
         Rect r = faces[i];
         Mat faceROI; //smallImgROI;
 
@@ -401,19 +400,26 @@ Java_com_example_lglcamera_activity_MainActivity_DetectAndMask(JNIEnv *env, jobj
         else {
             rectangle( img_result, Point(cvRound(r.x), cvRound(r.y)),
                        Point(cvRound((r.x + r.width-1)), cvRound((r.y + r.height-1))), Scalar(255, 192, 0), 4, 8, 0);
-        }*/
-        double min_face_size = faces[i].width * 0.7;
+        }
+
+        resize( mask, resized_mask, Size(2*radius, 2*radius), 1, 1, INTER_LINEAR_EXACT );
+
+        overlayImage(output2, resized_mask, result, Point(center.x - radius, center.y - radius));
+
+        // result 값을 output2에 복제
+        output2 = result.clone();
+
+        /*double min_face_size = faces[i].width * 0.7;
         double max_face_size = faces[i].width * 1.5;
         Point center( faces[i].x + faces[i].width * 0.5, faces[i].y + faces[i].height * 0.5 );
-        output2 = putMask(image, mask, center, Size( faces[i].width, faces[i].height ) );
-
+        output2 = putMask(output2, mask, center, Size( faces[i].width, faces[i].height ) );*/
     }
 
     // output2 값을 img_result에 복제 : 포인터를 이용하므로 img_result에 최종 이미지를 저장하면, 메인 액티비티에서 이 이미지를 사용할 수 있다.
     output2.copyTo(img_result);
 }
 
-Mat putMask( Mat src, Mat mask, Point center, Size face_size ) {
+/*Mat putMask( Mat src, Mat mask, Point center, Size face_size ) {
     Mat mask1, src1;
     resize( mask, mask1, face_size );
 
@@ -445,7 +451,7 @@ Mat putMask( Mat src, Mat mask, Point center, Size face_size ) {
     m1.copyTo( src( roi ) );
 
     return src;
-}
+}*/
 
 
 // cascade file copy and load
