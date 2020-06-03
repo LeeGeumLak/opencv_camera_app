@@ -175,12 +175,12 @@
         android:id="@+id/Textview_webRtc"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="45dp"
         android:layout_marginTop="312dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
-        android:text="화상통화"
-        android:textSize="20dp"
+        android:text="    화상통화"
+        android:textSize="20sp"
         android:textColor="@color/white"
         android:visibility="invisible"/>
 
