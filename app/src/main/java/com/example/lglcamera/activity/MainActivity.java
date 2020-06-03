@@ -101,7 +101,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
 
     // 버튼 클릭시, 애니메이션 이벤트
-    private Animation btnOpen, btnClose;
+    private Animation FilterBtnOpen, FilterBtnClose;
+    private Animation SettingsBtnOpen, SettingsBtnClose;
+    private Animation StickerBtnOpen, StickerBtnClose;
+
     private boolean isFilterBtnOpen = false;
     private boolean isSettingsBtnOpen = false;
     private boolean isStickerBtnOpen = false;
@@ -533,9 +536,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         });
 
-        // 버튼 슬라이드 인/아웃 애니메이션
-        btnOpen = AnimationUtils.loadAnimation(this, R.anim.btn_open);
-        btnClose = AnimationUtils.loadAnimation(this, R.anim.btn_close);
+        // 필터 버튼 슬라이드 인/아웃 애니메이션
+        FilterBtnOpen = AnimationUtils.loadAnimation(this, R.anim.btn_open);
+        FilterBtnClose = AnimationUtils.loadAnimation(this, R.anim.btn_close);
+
+        // 셋팅 버튼 슬라이드 인/아웃 애니메이션
+        SettingsBtnOpen = AnimationUtils.loadAnimation(this, R.anim.btn_open);
+        SettingsBtnClose = AnimationUtils.loadAnimation(this, R.anim.btn_close);
+
+        // 스티커 버튼 슬라이드 인/아웃 애니메이션
+        StickerBtnOpen = AnimationUtils.loadAnimation(this, R.anim.btn_open);
+        StickerBtnClose = AnimationUtils.loadAnimation(this, R.anim.btn_close);
     }
 
     /*@Override
@@ -564,21 +575,31 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // 필터 버튼 클릭시, 애니메이션 이벤트
     private void toggleFilterBtn() {
         if(isFilterBtnOpen) {
+
+            if(isStickerBtnOpen) {
+                toggleStickerBtn();
+                /*try {
+                    Thread.sleep(500); //0.5초 대기
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }*/
+            }
+
             Button_filter.setBackgroundResource(R.drawable.filter_change);
-            Button_Gray.startAnimation(btnClose);
-            Button_RGB.startAnimation(btnClose);
-            Button_HSV.startAnimation(btnClose);
-            Button_text.startAnimation(btnClose);
-            Button_sticker.startAnimation(btnClose);
+            Button_Gray.startAnimation(FilterBtnClose);
+            Button_RGB.startAnimation(FilterBtnClose);
+            Button_HSV.startAnimation(FilterBtnClose);
+            Button_text.startAnimation(FilterBtnClose);
+            Button_sticker.startAnimation(FilterBtnClose);
             isFilterBtnOpen = false;
         }
         else {
             Button_filter.setBackgroundResource(R.drawable.filter_pressed);
-            Button_Gray.startAnimation(btnOpen);
-            Button_RGB.startAnimation(btnOpen);
-            Button_HSV.startAnimation(btnOpen);
-            Button_text.startAnimation(btnOpen);
-            Button_sticker.startAnimation(btnOpen);
+            Button_Gray.startAnimation(FilterBtnOpen);
+            Button_RGB.startAnimation(FilterBtnOpen);
+            Button_HSV.startAnimation(FilterBtnOpen);
+            Button_text.startAnimation(FilterBtnOpen);
+            Button_sticker.startAnimation(FilterBtnOpen);
             isFilterBtnOpen = true;
         }
     }
@@ -587,16 +608,16 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private void toggleSettingsBtn() {
         if(isSettingsBtnOpen) {
             Button_settings.setBackgroundResource(R.drawable.settings);
-            Button_webRtc.startAnimation(btnClose);
-            Textview_webRtc.startAnimation(btnClose);
-            Switch_notification.startAnimation(btnClose);
+            Button_webRtc.startAnimation(SettingsBtnClose);
+            Textview_webRtc.startAnimation(SettingsBtnClose);
+            Switch_notification.startAnimation(SettingsBtnClose);
             isSettingsBtnOpen = false;
         }
         else {
             Button_settings.setBackgroundResource(R.drawable.settings_pressed);
-            Button_webRtc.startAnimation(btnOpen);
-            Textview_webRtc.startAnimation(btnOpen);
-            Switch_notification.startAnimation(btnOpen);
+            Button_webRtc.startAnimation(SettingsBtnOpen);
+            Textview_webRtc.startAnimation(SettingsBtnOpen);
+            Switch_notification.startAnimation(SettingsBtnOpen);
             isSettingsBtnOpen = true;
         }
     }
@@ -604,13 +625,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     // 스티커 버튼 클릭시, 애니메이션 이벤트
     private void toggleStickerBtn() {
         if(isStickerBtnOpen) {
-            Button_sunglasses.startAnimation(btnClose);
-            Button_mask.startAnimation(btnClose);
+            Button_sunglasses.startAnimation(StickerBtnClose);
+            Button_mask.startAnimation(StickerBtnClose);
             isStickerBtnOpen = false;
         }
         else {
-            Button_sunglasses.startAnimation(btnOpen);
-            Button_mask.startAnimation(btnOpen);
+            Button_sunglasses.startAnimation(StickerBtnOpen);
+            Button_mask.startAnimation(StickerBtnOpen);
             isStickerBtnOpen = true;
         }
     }
