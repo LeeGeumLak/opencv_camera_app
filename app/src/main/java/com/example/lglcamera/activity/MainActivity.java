@@ -6,6 +6,7 @@ import androidx.core.content.FileProvider;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -97,8 +98,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private String keyword;
     private PendingIntent pendingIntent;
     private AlarmManager alarmManager;
-    private final Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class); // 알람리시버 intent 생성
-
+    private Intent alarmIntent;
+    private NotificationManager notificationManager;
 
     // 버튼 클릭시, 애니메이션 이벤트
     private Animation FilterBtnOpen, FilterBtnClose;
@@ -224,28 +225,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
        /* StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());*/
 
+        // 사진 찍을 때, 저장할 폴더 생성(폴더가 존재하는 경우 pass), 폴더가 생성되지 않으면 앱 종료
+        mediaStorageDir = new File(Environment.getExternalStorageDirectory() + "/Images/");
+        if (!mediaStorageDir.exists()){
+            // 예외처리
+            if (!mediaStorageDir.mkdirs()){ // 만약 mkdirs()가 제대로 동작하지 않을 경우, 오류 Log를 출력한 뒤, 해당 method 종료
+                Log.d(TAG, "폴더 생성 실패");
+                exit(0);
+            }
+        }
+
         // sharedpreference에서 알람 on/off 유무 따져서 초기화
         alarmSp = getSharedPreferences("alarmFile", MODE_PRIVATE);
         isNotiChecked = alarmSp.getBoolean("alarmOnOff", false);
-
-        // 앱 실행시, 알람 설정버튼이 true 이지만, 알람 service가 실행중이 않을 때, 서비스를 실행함
-        if(isNotiChecked) { // isNotiChecked == true
-            if(!isServiceRunningCheck()) { // 알람에 관한 서비스가 실행중이지 않을때
-                alarmIntent.putExtra("state", "alarm on");
-
-                // Calendar 객체 생성 , 현재시간 받아오기
-                final Calendar calendar = Calendar.getInstance();
-
-                //pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
-
-                alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-
-                // 알람 설정
-                //long triggerTime = calendar.getTimeInMillis() + 1000*30; // 현재시간 + 30초
-                //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 1000*30, pendingIntent); // 30초 마다 alarm repeat
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000 * 30), 1000*30 ,pendingIntent); // 30초 마다 alarm repeat
-            }
-        }
 
         // UI 에 있는 버튼, 텍스트뷰, 스위치버튼 등의 findviewbyid 와 리스너 설정
         init();
@@ -296,63 +288,84 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Switch_notification = findViewById(R.id.Switch_notification);
         Switch_notification.setChecked(isNotiChecked);
 
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class); // 알람리시버 intent 생성
+
+        /*boolean alarmUp = (PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_NO_CREATE) != null);
+        Switch_notification.setChecked(alarmUp);*/
+
+        pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         Switch_notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isNotiChecked = isChecked;
                 Switch_notification.setChecked(isNotiChecked);
 
-                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
                 // 알람 설정이 되었을 때
                 if(isNotiChecked) {
                     // TODO : 서비스, 브로드캐스트 리시버 실행 기능 추가
-                    if(!isServiceRunningCheck()) { // 알람에 관한 서비스가 실행중이지 않을때
+
+                    //pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                    Log.d(TAG, "check 리스너 :: isNotiChecked == true");
+
+                    //if(!isServiceRunningCheck()) { // 알람에 관한 서비스가 실행중이지 않을때
+
+                        //Log.d(TAG, "check 리스너 :: 서비스가 실행중이지 않을때");
 
                         // 리시버에 string 값 넘겨주기
-                        alarmIntent.putExtra("state", "alarm on");
+                        //alarmIntent.putExtra("state", "alarm on");
 
                         // Calendar 객체 생성 , 현재시간 받아오기
-                        final Calendar calendar = Calendar.getInstance();
-
+                        //final Calendar calendar = Calendar.getInstance();
                         //pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
-
-                        alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                        //alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
                         // 알람 설정
                         //long triggerTime = calendar.getTimeInMillis() + 1000*30; // 현재시간 + 30초
                         //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 1000*30, pendingIntent); // 30초 마다 alarm repeat
-                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000 * 30), 1000*30 ,pendingIntent); // 30초 마다 alarm repeat
+                        //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (1000 * 30), 1000*30 ,pendingIntent); // 30초 마다 alarm repeat
+                        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), 1000*30 ,pendingIntent);
 
                         Toast.makeText(MainActivity.this, "알람이 설정되었습니다.", Toast.LENGTH_SHORT).show();
-                    }
+                    //}
                 }
                 // 알람 취소했을 때
                 else {
+                    Log.d(TAG, "check 리스너 :: isNotiChecked == false");
+
                     // TODO : 서비스, 브로드캐스트 리시버 실행 멈춤 기능 추가
                     // 알람 설정 해제
+                    //alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class); // 알람리시버 intent 생성
+                    //pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
                     alarmManager.cancel(pendingIntent);
-                    pendingIntent.cancel();
+                    notificationManager.cancelAll();
+
+                    //pendingIntent.cancel();
 
                     // 리시버에 string 값 넘겨주기
-                    alarmIntent.putExtra("state", "alarm off");
+                    //alarmIntent.putExtra("state", "alarm off");
                     /*pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);*/
                     /*if(pendingIntent != null) {
                         alarmManager.cancel(pendingIntent);
                     }*/
+
                     // 알람 취소
-                    sendBroadcast(alarmIntent);
+                    //sendBroadcast(alarmIntent);
 
                     Toast.makeText(MainActivity.this, "알람 설정이 해제되었습니다.", Toast.LENGTH_SHORT).show();
-
-
                     /*//checking if alarm is working with pendingIntent
                     Intent intent = new Intent(getActivity(), MyReceiver.class);//the same as up
                     intent.setAction(MyReceiver.ACTION_ALARM_RECEIVER);//the same as up
                     boolean isWorking = (PendingIntent.getBroadcast(getActivity(), 1001, intent, PendingIntent.FLAG_NO_CREATE) != null);//just changed the flag
                     Log.d(TAG, "alarm is " + (isWorking ? "" : "not") + " working...");*/
                 }
+
+                Log.d(TAG, "check 리스너 :: sharedpreferences 저장");
 
                 // 변경된 값을 저장
                 //SharedPreferences를 alarmFile이름, 기본모드로 설정
@@ -735,6 +748,36 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         //최종 커밋
         editor.commit();
+
+        // 앱 실행할 때, onResume에서 알람 설정이 되어있어도 알람을 껐으므로,
+        // 앱 종료할 때, 알람 설정버튼이 true 이면, 서비스를 실행함 (알람 service가 실행중이지 않을 때)
+        /*if(isNotiChecked) { // isNotiChecked == true
+            Log.d(TAG, "onStop :: isNotiChecked :: true");
+            if(!isServiceRunningCheck()) { // 알람에 관한 서비스가 실행중이지 않을때
+                alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class); // 알람리시버 intent 생성
+                alarmIntent.putExtra("state", "alarm on");
+
+                // Calendar 객체 생성 , 현재시간 받아오기
+                //final Calendar calendar = Calendar.getInstance();
+
+                //pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
+
+                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+                // 알람 설정
+                //long triggerTime = calendar.getTimeInMillis() + 1000*30; // 현재시간 + 30초
+                //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 1000*30, pendingIntent); // 30초 마다 alarm repeat
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000*30 ,pendingIntent); // 30초 마다 alarm repeat
+            }
+            else { // 알람에 관한 서비스가 실행중일때
+                // do nothing
+            }
+        }
+        else {
+            Log.d(TAG, "onStop :: isNotiChecked :: false");
+        }*/
+
     }
     @Override
     public void onResume() {
@@ -747,6 +790,35 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             Log.d(TAG, "onResume : OpenCV library found inside package. Using it!");
             loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
+
+        // 앱 실행시, 알람 설정버튼이 true 이지만 알림을 받을 필요가 없으므로, 서비스를 종료함(알람 service가 실행중일 때)
+        /*if(isNotiChecked) { // isNotiChecked == true
+            Log.d(TAG, "onResume :: isNotiChecked :: true");
+            if(isServiceRunningCheck()) { // 알람에 관한 서비스가 실행중일때
+                // 알람 설정 해제
+                alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class); // 알람리시버 intent 생성
+                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                alarmManager.cancel(pendingIntent);
+                pendingIntent.cancel();
+
+                // 리시버에 string 값 넘겨주기
+                alarmIntent.putExtra("state", "alarm off");
+                    *//*pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);*//*
+                    *//*if(pendingIntent != null) {
+                        alarmManager.cancel(pendingIntent);
+                    }*//*
+                // 알람 취소
+                sendBroadcast(alarmIntent);
+            }
+            else { // 알람에 관한 서비스가 실행중이지 않을때
+                isNotiChecked = false;
+            }
+        }
+        else {
+            Log.d(TAG, "onResume :: isNotiChecked :: false");
+        }*/
     }
 
 

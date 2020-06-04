@@ -131,11 +131,12 @@
         </provider>
 
         <!--  알림 기능을 위한 service와 receiver   -->
-        <service android:name=".alarm_core.AlarmService"/>
+<!--        <service android:name=".alarm_core.AlarmService"/>-->
 
         <receiver
             android:name=".alarm_core.AlarmReceiver"
-            android:enabled="true"/>
+            android:enabled="true"
+            android:exported="false"/>
 
     </application>
 </manifest>

@@ -75,6 +75,18 @@ long when = System.currentTimeMillis();
 
             notificationManager = ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE));
             notificationManager.createNotificationChannel(channel);
+
+            notification = new NotificationCompat.Builder(this, "default")
+                    .setContentTitle("LGL Camera")
+                    .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .build();
+
+            //notificationManager.notify(1, notification);
+            Log.d("AlarmService", "onCreate() :: startForeground 실행");
+            startForeground(1, notification);
         }
     }
 
@@ -89,17 +101,39 @@ long when = System.currentTimeMillis();
             case "alarm on":
                 //startId = 1;
 
-                notification = new NotificationCompat.Builder(this, "default")
+                /*notification = new NotificationCompat.Builder(this, "default")
                         .setContentTitle("LGL Camera")
                         .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setAutoCancel(true)
                         .setContentIntent(pendingIntent)
-                        .build();
+                        .build();*/
 
                 //notificationManager.notify(1, notification);
-                Log.e("AlarmService", "startForeground 실행");
-                startForeground(1, notification);
+                //Log.d("AlarmService", "onStartCommand :: startForeground 실행");
+
+                //startForeground(1, notification);
+
+                if (Build.VERSION.SDK_INT >= 26) {
+                    NotificationChannel channel = new NotificationChannel("default", "알람기능",
+                            NotificationManager.IMPORTANCE_DEFAULT);
+
+                    //long when = System.currentTimeMillis();
+
+                    notificationManager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+                    notificationManager.createNotificationChannel(channel);
+
+                    notification = new NotificationCompat.Builder(this, "default")
+                            .setContentTitle("LGL Camera")
+                            .setContentText("LGL Camera 를 통해 특별한 경험을 기록하세요!!")
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setAutoCancel(true)
+                            .setContentIntent(pendingIntent)
+                            .build();
+
+                    Log.d("AlarmService", "onCreate() :: startForeground 실행");
+                    startForeground(1, notification);
+                }
 
                 /*// Calendar 객체 생성 , 현재시간 받아오기
                 final Calendar calendar = Calendar.getInstance();
@@ -118,6 +152,8 @@ long when = System.currentTimeMillis();
                 //alarmManager.cancel(pendingIntent);
 
                 // 서비스를 멈추고, 파기함
+                Log.d("AlarmService", "onStartCommand :: 서비스 종료 및 파기");
+
                 stopSelf();
                 onDestroy();
 
